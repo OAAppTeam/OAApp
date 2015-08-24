@@ -11,6 +11,12 @@
 建议将所有的常量定义放在该文件中，便于检查是否存在重复的现象。
 '''
 
+EVENT_HISTORYSEQUENCEDATA = 'eHistorySequenceData' # 历史序列数据
+EVENT_MINUTEDATA = 'eMinuteData' # 分钟数据
+EVENT_TICKDATA = 'eTickData' # tick级别数据
+EVENT_HISTORYSECTIONDATA = 'eHistorySectionData' # 历史截面数据
+EVENT_MARKETDATA = 'eMarketData' # 行情数据
+
 
 EVENT_TIMER = 'eTimer'                  # 计时器事件，每隔1秒发送一次
 EVENT_LOG = 'eLog'                      # 日志事件，通常使用某个监听函数直接显示

@@ -6,5 +6,7 @@ from eventEngine import EventEngine
 class MainEngine:
 
     def __init__(self):
-        self.wa = WindApi()
+        self.ee = EventEngine()
+        self.wa = WindApi(self.ee)
         self.wa.start()
+        self.ee.start()

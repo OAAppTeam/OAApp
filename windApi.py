@@ -2,8 +2,12 @@
 __author__ = 'Justin'
 
 from WindPy import *
+from eventEngine import *
 
 class WindApi:
+
+    def __init__(self, eventEngine):
+        self.__eventEngine = eventEngine
 
     # 开启
     def start(self):
@@ -23,38 +27,40 @@ class WindApi:
 
     # 获取历史序列数据
     def getHistorySequenceData(self, security, fields, startDate, endDate, **option):
-        return w.wsd(security, fields, startDate, endDate, **option)
+        data = w.wsd(security, fields, startDate, endDate, **option)
+        event = Event(type_=EVENT_HISTORYSEQUENCEDATA)
+        event.dict_['data'] = data
+        self.__eventEngine.put(event)
 
     # 获取分钟数据
     def getMinuteData(self, security, fields, startTime, endTime, **option):
-        return w.wsi(security, fields, startTime, endTime, **option)
+        data = w.wsi(security, fields, startTime, endTime, **option)
+        event = Event(type_=EVENT_MINUTEDATA)
+        event.dict_['data'] = data
+        self.__eventEngine.put(event)
 
     # 获取日内tick级别数据
     def getTickData(self, security, fields, startTime, endTime, **option):
-        return w.wst(security, fields, startTime, endTime, **option)
+        data = w.wst(security, fields, startTime, endTime, **option)
+        event = Event(type_=EVENT_TICKDATA)
+        event.dict_['data'] = data
+        self.__eventEngine.put(event)
 
     # 获取历史截面数据
     def getHistorySectionData(self, security, fields, **option):
-        return w.wss(security, fields, **option)
+        data = w.wss(security, fields, **option)
+        event = Event(type_=EVENT_HISTORYSECTIONDATA)
+        event.dict_['data'] = data
+        self.__eventEngine.put(event)
 
     # 获取和订阅实时行情数据
     def subscribe(self, security, fields):
         w.wsq(security, fields, func=self.onSubscribe)
 
     def onSubscribe(self, indata):
-        if indata.ErrorCode != 0:
-            print('error code:'+str(indata.ErrorCode)+'\n')
-            return()
-        global begintime
-        lastvalue = ""
-        for k in range(0,len(indata.Fields)):
-            if(indata.Fields[k] == "RT_TIME"):
-                begintime = indata.Data[k][0]
-            if(indata.Fields[k] == "RT_LAST"):
-                lastvalue = str(indata.Data[k][0])
-        string = str(begintime) + " " + lastvalue + "\n"
-        # pf.writelines(string)
-        print(string)
+        event = Event(type_=EVENT_MARKETDATA)
+        event.dict_['data'] = indata
+        self.__eventEngine.put(event)
 
     # 获取板块、指数等成分数据
     def getMemberData(self):
