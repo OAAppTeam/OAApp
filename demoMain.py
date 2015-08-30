@@ -18,12 +18,9 @@ def main():
     
     app = QtGui.QApplication(sys.argv)
     app.setWindowIcon(QtGui.QIcon('vnpy.ico'))
-    
     me = MainEngine()
-    
     mw = MainWindow(me.ee, me)
     mw.showMaximized()
-    
     sys.exit(app.exec_())
 
 
