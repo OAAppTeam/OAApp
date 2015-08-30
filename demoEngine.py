@@ -98,10 +98,10 @@ class MainEngine:
             self.countGet = 0   # 清空计数
             
             if self.lastGet == 'Account':
-                self.getPosition()
+                self.getPosition()#查询持仓
                 self.lastGet = 'Position'
             else:
-                self.getAccount()
+                self.getAccount() #查询账户
                 self.lastGet = 'Account'
     
     #----------------------------------------------------------------------

@@ -1,20 +1,20 @@
 # encoding: UTF-8
 
 """
-该文件中包含的是交易平台的主函数，
-将底层、中层、上层的功能导入，并运行。
+璇ユ枃浠朵腑鍖呭惈鐨勬槸浜ゆ槗骞冲彴鐨勪富鍑芥暟锛�
+灏嗗簳灞傘�佷腑灞傘�佷笂灞傜殑鍔熻兘瀵煎叆锛屽苟杩愯銆�
 """
 
 import ctypes
 import sys
 
-from demoEngine import MainEngine
+from windEngine import MainEngine
 from demoUi import *
 
 #----------------------------------------------------------------------
 def main():
-    """主程序入口"""
-    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('vn.py demo')  # win7以下请注释掉该行   
+    """涓荤▼搴忓叆鍙�"""
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('vn.py demo')  # win7浠ヤ笅璇锋敞閲婃帀璇ヨ   
     
     app = QtGui.QApplication(sys.argv)
     app.setWindowIcon(QtGui.QIcon('vnpy.ico'))
