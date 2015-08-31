@@ -642,12 +642,16 @@ class LoginWidget(QtGui.QDialog):
      #   labelMdAddress = QtGui.QLabel(u'行情服务器：')
       #  labelTdAddress = QtGui.QLabel(u'交易服务器：')
         labelBrokerID = QtGui.QLabel(u'经纪商代码')
+        labelDepartmentID = QtGui.QLabel(u'营业部代码')
+        accountType = QtGui.QLabel(u'账户类型')
 
         self.editUserID = QtGui.QLineEdit()
         self.editPassword = QtGui.QLineEdit()
 #         self.editMdAddress = QtGui.QLineEdit()
 #         self.editTdAddress = QtGui.QLineEdit()
         self.editBrokerID = QtGui.QLineEdit()
+        self.editDepartmentID = QtGui.QLineEdit()
+        self.editAccountType = QtGui.QLineEdit()
 
         self.editUserID.setMinimumWidth(200)
 
@@ -668,13 +672,16 @@ class LoginWidget(QtGui.QDialog):
 #         grid.addWidget(labelMdAddress, 2, 0)
 #         grid.addWidget(labelTdAddress, 3, 0)
         grid.addWidget(labelBrokerID, 4, 0)
+        grid.addWidget(labelDepartmentID, 5, 0)
+        grid.addWidget(accountType, 6, 0)
         grid.addWidget(self.editUserID, 0, 1)
         grid.addWidget(self.editPassword, 1, 1)
 #         grid.addWidget(self.editMdAddress, 2, 1)
 #         grid.addWidget(self.editTdAddress, 3, 1)
         grid.addWidget(self.editBrokerID, 4, 1)
-        grid.addLayout(buttonHBox, 5, 0, 1, 2)
-
+        grid.addWidget(self.editDepartmentID, 5, 1)
+        grid.addWidget(self.editAccountType, 6, 1)
+        grid.addLayout(buttonHBox, 7, 0, 1, 2)
         self.setLayout(grid)
 
     #----------------------------------------------------------------------
@@ -686,7 +693,8 @@ class LoginWidget(QtGui.QDialog):
 #         tdAddress = str(self.editTdAddress.text())
         brokerid = str(self.editBrokerID.text())
         departmentid = 0#模拟交易参数
-        print self.__mainEngine.wa.tLogon(brokerid, departmentid , userid, password,'sh')
+        accountType = str(self.editDepartmentID.text())
+        print self.__mainEngine.wa.tLogon(brokerid, departmentid , userid, password,accountType)
         self.close()
 
     #----------------------------------------------------------------------
@@ -701,12 +709,18 @@ class LoginWidget(QtGui.QDialog):
 #             mdAddress = setting['mdAddress']
 #             tdAddress = setting['tdAddress']
             brokerid = setting['brokerid']
+           # departmentid = setting['departmentid']
+          #  accountType = setting['accountType']
+
+
 
             self.editUserID.setText(userid)
             self.editPassword.setText(password)
 #             self.editMdAddress.setText(mdAddress)
 #             self.editTdAddress.setText(tdAddress)
             self.editBrokerID.setText(brokerid)
+          #  self.editDepartmentID.setText(departmentid)
+          #  self.editAccountType.setText(accountType)
         except KeyError:
             pass
 
@@ -721,7 +735,8 @@ class LoginWidget(QtGui.QDialog):
 #         setting['mdAddress'] = str(self.editMdAddress.text())
 #         setting['tdAddress'] = str(self.editTdAddress.text())
         setting['brokerid'] = str(self.editBrokerID.text())
-
+        setting['departmentid'] = str(self.editDepartmentID.text())
+        setting['accountType'] = str(self.editAccountType.text())
         f = shelve.open('setting.vn')
         f['login'] = setting
         f.close()	
