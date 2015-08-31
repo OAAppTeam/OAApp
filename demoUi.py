@@ -1014,7 +1014,7 @@ class TradingWidget(QtGui.QWidget):
             self.__eventEngine.register(EVENT_MARKETDATA_CONTRACT+instrumentid, self.signal.emit)
 
             # 订阅合约
-            self.__mainEngine.subscribe(instrumentid, instrument['ExchangeID'])
+            self.__mainEngine.wa.subscribe(instrumentid, instrument['ExchangeID'])
 
             # 更新目前的合约
             self.instrumentid = instrumentid
@@ -1073,7 +1073,7 @@ class TradingWidget(QtGui.QWidget):
             price = float(self.spinPrice.value())
             volume = int(self.spinVolume.value())
             pricetype = self.dictPriceTypeReverse[unicode(self.comboPriceType.currentText())]
-            self.__mainEngine.sendOrder(instrumentid, exchangeid, price, pricetype, volume ,direction, offset)
+            self.__mainEngine.wa.tOrder(instrumentid, exchangeid, price, pricetype, volume ,direction, offset)
 
 
 ########################################################################
