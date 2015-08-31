@@ -639,14 +639,14 @@ class LoginWidget(QtGui.QDialog):
         # 设置组件
         labelUserID = QtGui.QLabel(u'账号：')
         labelPassword = QtGui.QLabel(u'密码：')
-        labelMdAddress = QtGui.QLabel(u'行情服务器：')
-        labelTdAddress = QtGui.QLabel(u'交易服务器：')
+     #   labelMdAddress = QtGui.QLabel(u'行情服务器：')
+      #  labelTdAddress = QtGui.QLabel(u'交易服务器：')
         labelBrokerID = QtGui.QLabel(u'经纪商代码')
 
         self.editUserID = QtGui.QLineEdit()
         self.editPassword = QtGui.QLineEdit()
-        self.editMdAddress = QtGui.QLineEdit()
-        self.editTdAddress = QtGui.QLineEdit()
+#         self.editMdAddress = QtGui.QLineEdit()
+#         self.editTdAddress = QtGui.QLineEdit()
         self.editBrokerID = QtGui.QLineEdit()
 
         self.editUserID.setMinimumWidth(200)
@@ -665,13 +665,13 @@ class LoginWidget(QtGui.QDialog):
         grid = QtGui.QGridLayout()
         grid.addWidget(labelUserID, 0, 0)
         grid.addWidget(labelPassword, 1, 0)
-        grid.addWidget(labelMdAddress, 2, 0)
-        grid.addWidget(labelTdAddress, 3, 0)
+#         grid.addWidget(labelMdAddress, 2, 0)
+#         grid.addWidget(labelTdAddress, 3, 0)
         grid.addWidget(labelBrokerID, 4, 0)
         grid.addWidget(self.editUserID, 0, 1)
         grid.addWidget(self.editPassword, 1, 1)
-        grid.addWidget(self.editMdAddress, 2, 1)
-        grid.addWidget(self.editTdAddress, 3, 1)
+#         grid.addWidget(self.editMdAddress, 2, 1)
+#         grid.addWidget(self.editTdAddress, 3, 1)
         grid.addWidget(self.editBrokerID, 4, 1)
         grid.addLayout(buttonHBox, 5, 0, 1, 2)
 
@@ -682,11 +682,11 @@ class LoginWidget(QtGui.QDialog):
         """登录"""
         userid = str(self.editUserID.text())
         password = str(self.editPassword.text())
-        mdAddress = str(self.editMdAddress.text())
-        tdAddress = str(self.editTdAddress.text())
+#         mdAddress = str(self.editMdAddress.text())
+#         tdAddress = str(self.editTdAddress.text())
         brokerid = str(self.editBrokerID.text())
-
-        self.__mainEngine.login(userid, password, brokerid, mdAddress, tdAddress)
+        departmentid = 0#模拟交易参数
+        print self.__mainEngine.wa.tLogon(brokerid, departmentid , userid, password,'sh')
         self.close()
 
     #----------------------------------------------------------------------
@@ -698,14 +698,14 @@ class LoginWidget(QtGui.QDialog):
             setting = f['login']
             userid = setting['userid']
             password = setting['password']
-            mdAddress = setting['mdAddress']
-            tdAddress = setting['tdAddress']
+#             mdAddress = setting['mdAddress']
+#             tdAddress = setting['tdAddress']
             brokerid = setting['brokerid']
 
             self.editUserID.setText(userid)
             self.editPassword.setText(password)
-            self.editMdAddress.setText(mdAddress)
-            self.editTdAddress.setText(tdAddress)
+#             self.editMdAddress.setText(mdAddress)
+#             self.editTdAddress.setText(tdAddress)
             self.editBrokerID.setText(brokerid)
         except KeyError:
             pass
@@ -718,8 +718,8 @@ class LoginWidget(QtGui.QDialog):
         setting = {}
         setting['userid'] = str(self.editUserID.text())
         setting['password'] = str(self.editPassword.text())
-        setting['mdAddress'] = str(self.editMdAddress.text())
-        setting['tdAddress'] = str(self.editTdAddress.text())
+#         setting['mdAddress'] = str(self.editMdAddress.text())
+#         setting['tdAddress'] = str(self.editTdAddress.text())
         setting['brokerid'] = str(self.editBrokerID.text())
 
         f = shelve.open('setting.vn')
