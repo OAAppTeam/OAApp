@@ -692,9 +692,13 @@ class LoginWidget(QtGui.QDialog):
 #         mdAddress = str(self.editMdAddress.text())
 #         tdAddress = str(self.editTdAddress.text())
         brokerid = str(self.editBrokerID.text())
-        departmentid = 0#模拟交易参数
+        departmentid = '0'#模拟交易参数
         accountType = str(self.editDepartmentID.text())
-        print self.__mainEngine.wa.tLogon(brokerid, departmentid , userid, password,accountType)
+        LogonID = self.__mainEngine.wa.tLogon(brokerid, departmentid , userid, password,accountType)
+        #LogonID = self.__mainEngine.wa.tLogon('0000', 0 , 'M:1585078833901', '111111','szb')
+
+        print LogonID
+        
         self.close()
 
     #----------------------------------------------------------------------

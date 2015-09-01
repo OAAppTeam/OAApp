@@ -78,7 +78,7 @@ class WindApi:
 
     #交易登录
     def tLogon(self, brokerId, departmentId, accountId, password, accountType):
-        w.tlogon(brokerId, departmentId, accountId, password, accountType)
+        return w.tlogon(brokerId, departmentId, accountId, password, accountType)
 
     # 交易登出
     def tLogout(self):

@@ -18,5 +18,9 @@ class MainEngine:
         self.wa.start()
         self.ee.start()
         
+    def exit(self):
+        self.wa.stop()
+        self.ee.stop()
+        
         
         
