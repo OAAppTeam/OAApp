@@ -55,12 +55,24 @@ class WindApi:
 
     # 获取和订阅实时行情数据
     def subscribe(self, security, fields):
-        w.wsq(security, fields, func=self.onSubscribe)
+        return w.wsq(security, fields, func=self.onSubscribe)
 
     def onSubscribe(self, indata):
-        event = Event(type_=EVENT_MARKETDATA)
-        event.dict_['data'] = indata
-        self.__eventEngine.put(event)
+        if indata.ErrorCode != 0:
+            event = Event(type_=EVENT_LOG)
+            log = u'合约查询错误，错误代码：' + unicode(indata.ErrorCode) + u',' + u'错误信息：' + unicode(indata.Data[3])
+            event.dict_['log'] = log
+            self.__eventEngine.put(event)
+        else:
+            event = Event(type_=EVENT_LOG)
+            log = u'合约查询成功'
+            event.dict_['log'] = log
+            self.__eventEngine.put(event)
+            event = Event(type_=EVENT_MARKETDATA)
+            event.dict_['data'] = indata.Data
+            event.dict_['code'] = indata.Codes
+            event.dict_['time'] = indata.Times
+            self.__eventEngine.put(event)
 
     # 获取板块、指数等成分数据
     def getMemberData(self):
@@ -78,8 +90,19 @@ class WindApi:
 
     #交易登录
     def tLogon(self, brokerId, departmentId, accountId, password, accountType):
-        return w.tlogon(brokerId, departmentId, accountId, password, accountType)
-
+        LogonID = w.tlogon(brokerId, departmentId, accountId, password, accountType)
+        print LogonID
+        if LogonID.ErrorCode != 0:
+            event = Event(type_=EVENT_LOG)
+            log = u'登陆错误，错误代码：' + unicode(LogonID.ErrorCode) + u',' + u'错误信息：' + unicode(LogonID.Data[3])
+            event.dict_['log'] = log
+            self.__eventEngine.put(event)
+        else:
+            event = Event(type_=EVENT_LOG)
+            log = u'登陆成功'
+            event.dict_['log'] = log
+            self.__eventEngine.put(event)
+            
     # 交易登出
     def tLogout(self):
         w.tlogout()

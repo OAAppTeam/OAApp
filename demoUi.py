@@ -576,17 +576,20 @@ class MarketDataMonitor(QtGui.QTableWidget):
     def updateData(self, event):
         """"""
         data = event.dict_['data']
-        instrumentid = data['InstrumentID']
+        time = event.dict_['time'][0]
+        instrumentid = event.dict_['code'][0]
+        data.insert(0,'')
 
         # 如果之前已经收到过这个账户的数据, 则直接更新
         if instrumentid in self.dictData:
             d = self.dictData[instrumentid]
 
             for label, cell in d.items():
+                print label
                 if label != 'Name':
                     value = str(data[label])	
                 else:
-                    value = self.getName(data['InstrumentID'])
+                    value = ''
                 cell.setText(value)
         # 否则插入新的一行，并更新
         else:
@@ -596,17 +599,18 @@ class MarketDataMonitor(QtGui.QTableWidget):
 
             for col, label in enumerate(self.dictLabels.keys()):
                 if label != 'Name':
-                    value = str(data[label])				    
+                    value = str(data[col])				    
                     cell = QtGui.QTableWidgetItem(value)
                     self.setItem(row, col, cell)
                     d[label] = cell
                 else:
-                    name = self.getName(data['InstrumentID'])			    
+                    name = ''			    
                     cell = QtGui.QTableWidgetItem(name)	
                     self.setItem(row, col, cell)
                     d[label] = cell
 
             self.dictData[instrumentid] = d
+            
 
     #----------------------------------------------------------------------
     def getName(self, instrumentid):
@@ -693,11 +697,10 @@ class LoginWidget(QtGui.QDialog):
 #         tdAddress = str(self.editTdAddress.text())
         brokerid = str(self.editBrokerID.text())
         departmentid = '0'#模拟交易参数
-        accountType = str(self.editDepartmentID.text())
-        LogonID = self.__mainEngine.wa.tLogon(brokerid, departmentid , userid, password,accountType)
-        #LogonID = self.__mainEngine.wa.tLogon('0000', 0 , 'M:1585078833901', '111111','szb')
-
-        print LogonID
+        accountType = str(self.editAccountType.text())
+        print userid,password,brokerid,accountType
+        #self.__mainEngine.wa.tLogon('00000010', '0' , "M:1585078833901", '111111','SHSZ')
+        self.__mainEngine.wa.tLogon(brokerid, departmentid , userid, password,accountType)
         
         self.close()
 
@@ -713,8 +716,8 @@ class LoginWidget(QtGui.QDialog):
 #             mdAddress = setting['mdAddress']
 #             tdAddress = setting['tdAddress']
             brokerid = setting['brokerid']
-           # departmentid = setting['departmentid']
-          #  accountType = setting['accountType']
+            departmentid = setting['departmentid']
+            accountType = setting['accountType']
 
 
 
@@ -723,8 +726,8 @@ class LoginWidget(QtGui.QDialog):
 #             self.editMdAddress.setText(mdAddress)
 #             self.editTdAddress.setText(tdAddress)
             self.editBrokerID.setText(brokerid)
-          #  self.editDepartmentID.setText(departmentid)
-          #  self.editAccountType.setText(accountType)
+            self.editDepartmentID.setText(departmentid)
+            self.editAccountType.setText(accountType)
         except KeyError:
             pass
 
@@ -981,9 +984,9 @@ class TradingWidget(QtGui.QWidget):
         instrumentid = str(self.lineID.text())
 
         # 获取合约
-        instrument = self.__mainEngine.selectInstrument(instrumentid)
-        if instrument:
-            self.lineName.setText(instrument['InstrumentName'].decode('GBK'))
+        instrument = self.__mainEngine.wa.subscribe(instrumentid, "rt_bid1,rt_bsize1,rt_ask1,rt_asize1,rt_latest,rt_vol,rt_time")
+        if instrument.ErrorCode==0:
+            #self.lineName.setText(instrument['InstrumentName'].decode('GBK'))
 
             # 清空价格数量
             self.spinPrice.setValue(0)
@@ -1018,7 +1021,7 @@ class TradingWidget(QtGui.QWidget):
             self.__eventEngine.register(EVENT_MARKETDATA_CONTRACT+instrumentid, self.signal.emit)
 
             # 订阅合约
-            self.__mainEngine.wa.subscribe(instrumentid, instrument['ExchangeID'])
+            self.__mainEngine.wa.subscribe(instrumentid, "rt_bid1,rt_bsize1,rt_ask1,rt_asize1,rt_latest,rt_vol,rt_time")
 
             # 更新目前的合约
             self.instrumentid = instrumentid
