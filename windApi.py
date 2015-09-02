@@ -60,7 +60,7 @@ class WindApi:
     def onSubscribe(self, indata):
         if indata.ErrorCode != 0:
             event = Event(type_=EVENT_LOG)
-            log = u'合约查询错误，错误代码：' + unicode(indata.ErrorCode) + u',' + u'错误信息：' + unicode(indata.Data[3])
+            log = u'合约查询错误，错误代码：' + unicode(indata.ErrorCode) + u',' + u'错误信息：' + unicode(indata.Data[4])
             event.dict_['log'] = log
             self.__eventEngine.put(event)
         else:
