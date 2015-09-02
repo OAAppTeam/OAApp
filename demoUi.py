@@ -578,18 +578,43 @@ class MarketDataMonitor(QtGui.QTableWidget):
         data = event.dict_['data']
         time = event.dict_['time'][0]
         instrumentid = event.dict_['code'][0]
-        data.insert(0,'')
+        
 
         # 如果之前已经收到过这个账户的数据, 则直接更新
         if instrumentid in self.dictData:
             d = self.dictData[instrumentid]
 
             for label, cell in d.items():
-                print label
-                if label != 'Name':
-                    value = str(data[label])	
-                else:
-                    value = ''
+                if label == 'InstrumentID':
+                    value = str(instrumentid)                    
+                    
+                elif label=='Name':
+                    value = ''                
+                    
+                elif label=='ExchangeInstID':
+                    value = str(instrumentid)                    
+                    
+                elif label=='BidPrice1':
+                    value = str(data[0][0])                    
+                    
+                elif label=='BidVolume1':
+                    value = str(data[1][0])                    
+                    
+                elif label=='AskPrice1':
+                    value = str(data[2][0])                    
+                    
+                elif label=='AskVolume1':
+                    value = str(data[3][0])                    
+                
+                elif label=='Volume':
+                    value = str(data[4][0]) 
+                    
+                elif label=='LastPrice':
+                    value = str(data[5][0])                    
+                    
+                elif label=='UpdateTime':
+                    value = str(time)                    
+                    
                 cell.setText(value)
         # 否则插入新的一行，并更新
         else:
@@ -598,17 +623,58 @@ class MarketDataMonitor(QtGui.QTableWidget):
             d = {}
 
             for col, label in enumerate(self.dictLabels.keys()):
-                if label != 'Name':
-                    value = str(data[col])				    
+                
+                if label == 'InstrumentID':
+                    value = str(instrumentid)				    
                     cell = QtGui.QTableWidgetItem(value)
                     self.setItem(row, col, cell)
                     d[label] = cell
-                else:
+                elif label=='Name':
                     name = ''			    
                     cell = QtGui.QTableWidgetItem(name)	
                     self.setItem(row, col, cell)
                     d[label] = cell
-
+                elif label=='ExchangeInstID':
+                    value = str(instrumentid)                    
+                    cell = QtGui.QTableWidgetItem(value)
+                    self.setItem(row, col, cell)
+                    d[label] = cell
+                elif label=='BidPrice1':
+                    value = str(data[0][0])                    
+                    cell = QtGui.QTableWidgetItem(value)
+                    self.setItem(row, col, cell)
+                    d[label] = cell
+                elif label=='BidVolume1':
+                    value = str(data[1][0])                    
+                    cell = QtGui.QTableWidgetItem(value)
+                    self.setItem(row, col, cell)
+                    d[label] = cell
+                elif label=='AskPrice1':
+                    value = str(data[2][0])                    
+                    cell = QtGui.QTableWidgetItem(value)
+                    self.setItem(row, col, cell)
+                    d[label] = cell
+                elif label=='AskVolume1':
+                    value = str(data[3][0])                    
+                    cell = QtGui.QTableWidgetItem(value)
+                    self.setItem(row, col, cell)
+                    d[label] = cell
+                elif label=='Volume':
+                    value = str(data[5][0])                    
+                    cell = QtGui.QTableWidgetItem(value)
+                    self.setItem(row, col, cell)
+                    d[label] = cell
+                elif label=='LastPrice':
+                    value = str(data[4][0])                    
+                    cell = QtGui.QTableWidgetItem(value)
+                    self.setItem(row, col, cell)
+                    d[label] = cell
+                elif label=='UpdateTime':
+                    value = str(time)                    
+                    cell = QtGui.QTableWidgetItem(value)
+                    self.setItem(row, col, cell)
+                    d[label] = cell
+                
             self.dictData[instrumentid] = d
             
 
@@ -1018,10 +1084,10 @@ class TradingWidget(QtGui.QWidget):
 
             # 重新注册事件监听
             self.__eventEngine.unregister(EVENT_MARKETDATA_CONTRACT+self.instrumentid, self.signal.emit)
-            self.__eventEngine.register(EVENT_MARKETDATA_CONTRACT+instrumentid, self.signal.emit)
-
-            # 订阅合约
-            self.__mainEngine.wa.subscribe(instrumentid, "rt_bid1,rt_bsize1,rt_ask1,rt_asize1,rt_latest,rt_vol,rt_time")
+#             self.__eventEngine.register(EVENT_MARKETDATA_CONTRACT+instrumentid, self.signal.emit)
+# 
+#             # 订阅合约
+#             self.__mainEngine.wa.subscribe(instrumentid, "rt_bid1,rt_bsize1,rt_ask1,rt_asize1,rt_latest,rt_vol,rt_time")
 
             # 更新目前的合约
             self.instrumentid = instrumentid
