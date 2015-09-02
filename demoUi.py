@@ -524,7 +524,7 @@ class OrderMonitor(QtGui.QTableWidget):
 
 ########################################################################
 class MarketDataMonitor(QtGui.QTableWidget):
-    """用于显示行情"""
+    """用于显示行情 """
     signal = QtCore.pyqtSignal(type(Event()))
 
     dictLabels = OrderedDict()
