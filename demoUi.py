@@ -19,6 +19,7 @@ import sip
 from PyQt4 import QtCore, QtGui
 
 from eventEngine import *
+from matplotlib.transforms import offset_copy
 
 
 
@@ -870,10 +871,10 @@ class TradingWidget(QtGui.QWidget):
     dictOffset['3'] = u'平今'
 
     dictPriceType = OrderedDict()
-    dictPriceType['1'] = u'任意价'
-    dictPriceType['2'] = u'限价'
-    dictPriceType['3'] = u'最优价'
-    dictPriceType['4'] = u'最新价'
+    
+    dictPriceType['0'] = u'限价委托'
+    dictPriceType['4'] = u'最优五档剩余撤销'
+    dictPriceType['6'] = u'最优五档剩余转限价'
 
     # 反转字典
     dictDirectionReverse = {value:key for key,value in dictDirection.items()}
@@ -1050,7 +1051,7 @@ class TradingWidget(QtGui.QWidget):
         instrumentid = str(self.lineID.text())
 
         # 获取合约
-        instrument = self.__mainEngine.wa.subscribe(instrumentid, "rt_bid1,rt_bsize1,rt_ask1,rt_asize1,rt_latest,rt_vol,rt_time")
+        instrument = self.__mainEngine.wa.subscribe(instrumentid, "rt_bid1,rt_bsize1,rt_ask1,rt_asize1,rt_latest,rt_vol,rt_time,rt_bid2,rt_bid3,rt_bid4,rt_bid5,rt_ask2,rt_ask3,rt_ask4,rt_ask5,rt_bsize2,rt_bsize3,rt_bsize4,rt_bsize5,rt_asize2,rt_asize3,rt_asize4,rt_asize5,rt_pre_close")
         if instrument.ErrorCode==0:
             #self.lineName.setText(instrument['InstrumentName'].decode('GBK'))
 
@@ -1083,7 +1084,7 @@ class TradingWidget(QtGui.QWidget):
             self.labelReturn.setText('')
 
             # 重新注册事件监听
-            self.__eventEngine.unregister(EVENT_MARKETDATA_CONTRACT+self.instrumentid, self.signal.emit)
+#             self.__eventEngine.unregister(EVENT_MARKETDATA_CONTRACT+self.instrumentid, self.signal.emit)
 #             self.__eventEngine.register(EVENT_MARKETDATA_CONTRACT+instrumentid, self.signal.emit)
 # 
 #             # 订阅合约
@@ -1096,59 +1097,77 @@ class TradingWidget(QtGui.QWidget):
     def updateMarketData(self, event):
         """更新行情"""
         data = event.dict_['data']
-
-        if data['InstrumentID'] == self.instrumentid:
-            self.labelBidPrice1.setText(str(data['BidPrice1']))
-            self.labelAskPrice1.setText(str(data['AskPrice1']))
-            self.labelBidVolume1.setText(str(data['BidVolume1']))
-            self.labelAskVolume1.setText(str(data['AskVolume1']))
+        time = event.dict_['time'][0]
+        instrumentid = event.dict_['code'][0]
+        
+        if instrumentid == self.instrumentid:
+            self.labelBidPrice1.setText(str(data[0][0]))
+            self.labelAskPrice1.setText(str(data[2][0]))
+            self.labelBidVolume1.setText(str(data[1][0]))
+            self.labelAskVolume1.setText(str(data[3][0]))
             
-            if data['BidVolume2']:
-                self.labelBidPrice2.setText(str(data['BidPrice2']))
-                self.labelBidPrice3.setText(str(data['BidPrice3']))
-                self.labelBidPrice4.setText(str(data['BidPrice4']))
-                self.labelBidPrice5.setText(str(data['BidPrice5']))
+            if data[15][0]:
+                self.labelBidPrice2.setText(str(data[7][0]))
+                self.labelBidPrice3.setText(str(data[8][0]))
+                self.labelBidPrice4.setText(str(data[9][0]))
+                self.labelBidPrice5.setText(str(data[10][0]))
 
-                self.labelAskPrice2.setText(str(data['AskPrice2']))
-                self.labelAskPrice3.setText(str(data['AskPrice3']))
-                self.labelAskPrice4.setText(str(data['AskPrice4']))
-                self.labelAskPrice5.setText(str(data['AskPrice5']))
+                self.labelAskPrice2.setText(str(data[11][0]))
+                self.labelAskPrice3.setText(str(data[12][0]))
+                self.labelAskPrice4.setText(str(data[13][0]))
+                self.labelAskPrice5.setText(str(data[14][0]))
             
-                self.labelBidVolume2.setText(str(data['BidVolume2']))
-                self.labelBidVolume3.setText(str(data['BidVolume3']))
-                self.labelBidVolume4.setText(str(data['BidVolume4']))
-                self.labelBidVolume5.setText(str(data['BidVolume5']))
+                self.labelBidVolume2.setText(str(data[15][0]))
+                self.labelBidVolume3.setText(str(data[16][0]))
+                self.labelBidVolume4.setText(str(data[17][0]))
+                self.labelBidVolume5.setText(str(data[18][0]))
                 
-                self.labelAskVolume2.setText(str(data['AskVolume2']))
-                self.labelAskVolume3.setText(str(data['AskVolume3']))
-                self.labelAskVolume4.setText(str(data['AskVolume4']))
-                self.labelAskVolume5.setText(str(data['AskVolume5']))	
+                self.labelAskVolume2.setText(str(data[19][0]))
+                self.labelAskVolume3.setText(str(data[20][0]))
+                self.labelAskVolume4.setText(str(data[21][0]))
+                self.labelAskVolume5.setText(str(data[22][0]))	
 
-            self.labelLastPrice.setText(str(data['LastPrice']))
-            rt = (data['LastPrice']/data['PreClosePrice'])-1
+            self.labelLastPrice.setText(str(data[4][0]))
+            rt = (float(data[4][0])/float(data[23][0]))-1
             self.labelReturn.setText(('%.2f' %(rt*100))+'%')
 
     #----------------------------------------------------------------------
     def registerEvent(self):
         """注册事件监听"""
         self.signal.connect(self.updateMarketData)
+        self.__eventEngine.register(EVENT_MARKETDATA_CONTRACT, self.signal.emit)
 
     #----------------------------------------------------------------------
     def sendOrder(self):
         """发单"""
         instrumentid = str(self.lineID.text())
 
-        instrument = self.__mainEngine.selectInstrument(instrumentid)
-        if instrument:
-            exchangeid = instrument['ExchangeID']
-            direction = self.dictDirectionReverse[unicode(self.comboDirection.currentText())]
-            offset = self.dictOffsetReverse[unicode(self.comboOffset.currentText())]
-            price = float(self.spinPrice.value())
-            volume = int(self.spinVolume.value())
-            pricetype = self.dictPriceTypeReverse[unicode(self.comboPriceType.currentText())]
-            self.__mainEngine.wa.tOrder(instrumentid, exchangeid, price, pricetype, volume ,direction, offset)
+        #instrument = self.__mainEngine.selectInstrument(instrumentid)
+        #if instrument:
+        
+        direction = self.dictDirectionReverse[unicode(self.comboDirection.currentText())]
+        offset = self.dictOffsetReverse[unicode(self.comboOffset.currentText())]
+        tradeside = self.getTradeSide(direction,offset)
+        price = str(self.spinPrice.value())
+        volume = str(self.spinVolume.value())
+        pricetype = self.dictPriceTypeReverse[unicode(self.comboPriceType.currentText())]
+        self.__mainEngine.wa.tOrder(instrumentid, tradeside, price, volume, OrderType=pricetype)
 
-
+    def getTradeSide(self, dir, offset):
+        if dir== '0' and offset == '0':
+            return 'Buy'
+        elif dir== '1' and offset == '0':
+            return 'Short'
+        elif dir== '0' and offset == '1':
+            return 'Cover'
+        elif dir== '1' and offset == '1':
+            return 'Sell'
+        elif dir== '0' and offset == '3':
+            return 'CoverToday'
+        elif dir== '1' and offset == '3':
+            return 'SellToday'
+            
+        
 ########################################################################
 class AboutWidget(QtGui.QDialog):
     """显示关于信息"""

@@ -73,6 +73,11 @@ class WindApi:
             event.dict_['code'] = indata.Codes
             event.dict_['time'] = indata.Times
             self.__eventEngine.put(event)
+            event = Event(type_=EVENT_MARKETDATA_CONTRACT)
+            event.dict_['data'] = indata.Data
+            event.dict_['code'] = indata.Codes
+            event.dict_['time'] = indata.Times
+            self.__eventEngine.put(event)
 
     # 获取板块、指数等成分数据
     def getMemberData(self):
@@ -109,7 +114,18 @@ class WindApi:
 
     # 委托下单
     def tOrder(self, securityCode, tradeSide, orderPrice, orderVolume, **option):
-        w.torder(securityCode, tradeSide, orderPrice, orderVolume, **option)
+        message = w.torder(securityCode, tradeSide, orderPrice, orderVolume, **option)
+        print message
+        if message.ErrorCode != 0:
+            event = Event(type_=EVENT_LOG)
+            log = u'发单错误，错误代码：' + unicode(message.ErrorCode) + u',' + u'错误信息：' + unicode(message.Data[7])
+            event.dict_['log'] = log
+            self.__eventEngine.put(event)
+        else:
+            event = Event(type_=EVENT_LOG)
+            log = u'发单成功'
+            event.dict_['log'] = log
+            self.__eventEngine.put(event)
 
     # 撤销委托
     def tCancel(self, orderNum, **option):
