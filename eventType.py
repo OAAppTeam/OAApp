@@ -16,6 +16,9 @@ EVENT_MINUTEDATA = 'eMinuteData' # 分钟数据
 EVENT_TICKDATA = 'eTickData' # tick级别数据
 EVENT_HISTORYSECTIONDATA = 'eHistorySectionData' # 历史截面数据
 EVENT_MARKETDATA = 'eMarketData' # 行情数据
+EVENT_POSITION = 'ePosition'   #持仓数据
+EVENT_TLOGON = 'sTlogon'    #初始化查询
+EVENT_INSTRUMENT = 'eInstrument'     # 合约查询回报事件
 
 
 EVENT_TIMER = 'eTimer'                  # 计时器事件，每隔1秒发送一次
