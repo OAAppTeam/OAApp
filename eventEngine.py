@@ -193,7 +193,11 @@ def test():
     app = QCoreApplication(sys.argv)
     
     ee = EventEngine()
-    ee.register(EVENT_TIMER, simpletest)
+    # ee.register(EVENT_TIMER, simpletest)
+
+    from wsqsave import loop, myCallback
+    loop()
+
     ee.start()
     
     app.exec_()
