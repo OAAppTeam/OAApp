@@ -311,7 +311,7 @@ class PositionMonitor(QtGui.QTableWidget):
     def updatePosition(self, event):
         """"""
         data = event.dict_['data']
-
+        print data
         # 过滤返回值为空的情况
         if data['InstrumentID']:
             posid = data['InstrumentID'] + '.' + data['PosiDirection']
