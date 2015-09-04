@@ -117,7 +117,7 @@ class WindApi:
 
     # 交易查询
     def tQuery(self, qryCode, **option):
-        w.tquery(qryCode, **option)
+        return w.tquery(qryCode, **option)
 
     # 日期函数
 
