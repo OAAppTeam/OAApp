@@ -104,7 +104,7 @@ class WindApi:
         print LogonID
         if LogonID.ErrorCode != 0:
             event = Event(type_=EVENT_LOG)
-            log = u'登陆错误，错误代码：' + unicode(LogonID.ErrorCode) + u',' + u'错误信息：' + unicode(LogonID.Data[4])
+            log = u'登陆错误，错误代码：' + unicode(LogonID.ErrorCode) + u',' + u'错误信息：' + unicode(LogonID.Data[0][0])
             event.dict_['log'] = log
             self.__eventEngine.put(event)
         else:
@@ -123,7 +123,7 @@ class WindApi:
         print message
         if message.ErrorCode != 0:
             event = Event(type_=EVENT_LOG)
-            log = u'发单错误，错误代码：' + unicode(message.ErrorCode) + u',' + u'错误信息：' + unicode(message.Data[6][0])
+            log = u'发单错误，错误代码：' + unicode(message.ErrorCode) + u',' + u'错误信息：' + unicode(message.Data[1][0])
             event.dict_['log'] = log
             self.__eventEngine.put(event)
         else:
