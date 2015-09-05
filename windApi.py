@@ -1,5 +1,4 @@
 # encoding: UTF-8
-from pandas.io.sql import tquery
 __author__ = 'Justin'
 
 from WindPy import *
@@ -27,29 +26,29 @@ class WindApi:
         w.cancelRequest(id)
 
     # 获取历史序列数据
-    def getHistorySequenceData(self, security, fields, startDate, endDate, **option):
-        data = w.wsd(security, fields, startDate, endDate, **option)
+    def getHistorySequenceData(self, security, fields, startDate, endDate, *option):
+        data = w.wsd(security, fields, startDate, endDate, *option)
         event = Event(type_=EVENT_HISTORYSEQUENCEDATA)
         event.dict_['data'] = data
         self.__eventEngine.put(event)
 
     # 获取分钟数据
-    def getMinuteData(self, security, fields, startTime, endTime, **option):
-        data = w.wsi(security, fields, startTime, endTime, **option)
+    def getMinuteData(self, security, fields, startTime, endTime, *option):
+        data = w.wsi(security, fields, startTime, endTime, *option)
         event = Event(type_=EVENT_MINUTEDATA)
         event.dict_['data'] = data
         self.__eventEngine.put(event)
 
     # 获取日内tick级别数据
-    def getTickData(self, security, fields, startTime, endTime, **option):
-        data = w.wst(security, fields, startTime, endTime, **option)
+    def getTickData(self, security, fields, startTime, endTime, *option):
+        data = w.wst(security, fields, startTime, endTime, *option)
         event = Event(type_=EVENT_TICKDATA)
         event.dict_['data'] = data
         self.__eventEngine.put(event)
 
     # 获取历史截面数据
-    def getHistorySectionData(self, security, fields, **option):
-        data = w.wss(security, fields, **option)
+    def getHistorySectionData(self, security, fields, *option):
+        data = w.wss(security, fields, *option)
         event = Event(type_=EVENT_HISTORYSECTIONDATA)
         event.dict_['data'] = data
         self.__eventEngine.put(event)
@@ -101,25 +100,28 @@ class WindApi:
     #交易登录
     def tLogon(self, brokerId, departmentId, accountId, password, accountType):
         LogonID = w.tlogon(brokerId, departmentId, accountId, password, accountType)
-        print LogonID
         if LogonID.ErrorCode != 0:
             event = Event(type_=EVENT_LOG)
             log = u'登陆错误，错误代码：' + unicode(LogonID.ErrorCode) + u',' + u'错误信息：' + unicode(LogonID.Data[0][0])
             event.dict_['log'] = log
             self.__eventEngine.put(event)
         else:
-            event = Event(type_=EVENT_LOG)
+            event1 = Event(type_=EVENT_LOG)
             log = u'登陆成功'
-            event.dict_['log'] = log
-            self.__eventEngine.put(event)
+            event1.dict_['log'] = log
+            self.__eventEngine.put(event1)
+
+            event2 = Event(type_=EVENT_TLOGON)
+            event2.dict_['data'] = LogonID
+            self.__eventEngine.put(event2)
             
     # 交易登出
     def tLogout(self):
         w.tlogout()
 
     # 委托下单
-    def tOrder(self, securityCode, tradeSide, orderPrice, orderVolume, **option):
-        message = w.torder(securityCode, tradeSide, orderPrice, orderVolume, **option)
+    def tOrder(self, securityCode, tradeSide, orderPrice, orderVolume, *option):
+        message = w.torder(securityCode, tradeSide, orderPrice, orderVolume, *option)
         print message
         if message.ErrorCode != 0:
             event = Event(type_=EVENT_LOG)
@@ -142,12 +144,25 @@ class WindApi:
             
 
     # 撤销委托
-    def tCancel(self, orderNum, **option):
-        w.tcancel(orderNum, **option)
+    def tCancel(self, orderNum, *option):
+        w.tcancel(orderNum, *option)
 
     # 交易查询
-    def tQuery(self, qryCode, **option):
-        return w.tquery(qryCode, **option)
+    def tQuery(self, qryCode, *option):
+        if qryCode == 'LogonID':
+            return w.tquery(qryCode, *option)
+        elif qryCode == 'Account':
+            data = w.tquery(qryCode, *option)
+            event = Event(type_=EVENT_ACCOUNT)
+            event.dict_['data'] = data
+            self.__eventEngine.put(event)
+            print 'account done'
+        elif qryCode == 'Position':
+            data = w.tquery(qryCode, *option)
+            event = Event(type_=EVENT_POSITION)
+            event.dict_['data'] = data
+            self.__eventEngine.put(event)
+            print 'position done'
 
     # 日期函数
 
