@@ -445,7 +445,7 @@ class OrderMonitor(QtGui.QTableWidget):
         data = event.dict_['data']
         orderSysID = data[0][0]
         options = 'LogonID='+str(self.__mainEngine.wa.tQuery('LogonID').Data[0][0])+';RequestID='+str(orderSysID)+';showfields=OrderNumber,OrderStatus,OrderTime,TradeVolume'
-        message = self.__mainEngine.wa.tQuery('Order',op = options)
+        message = self.__mainEngine.wa.tQuery('Order', options)
         print message
         ordernum = message.Data[0][0]
         self.dictOrderData[orderSysID] = data
@@ -1174,7 +1174,7 @@ class TradingWidget(QtGui.QWidget):
         """合约变化"""
         instrumentid = str(self.lineID.text())
         # 获取合约
-        instrument = self.__mainEngine.wa.subscribe(instrumentid, "rt_bid1,rt_bsize1,rt_ask1,rt_asize1,rt_latest,rt_vol,rt_time,rt_bid2,rt_bid3,rt_bid4,rt_bid5,rt_ask2,rt_ask3,rt_ask4,rt_ask5,rt_bsize2,rt_bsize3,rt_bsize4,rt_bsize5,rt_asize2,rt_asize3,rt_asize4,rt_asize5,rt_pre_close")
+        instrument = self.__mainEngine.wa.subscribe(instrumentid, "rt_bid1,rt_bsize1,rt_ask1,rt_asize1,rt_latest,rt_vol,rt_time,rt_pre_close")
         if instrument.ErrorCode==0:
             #self.lineName.setText(instrument['InstrumentName'].decode('GBK'))
 
@@ -1229,29 +1229,29 @@ class TradingWidget(QtGui.QWidget):
             self.labelBidVolume1.setText(str(data[1][0]))
             self.labelAskVolume1.setText(str(data[3][0]))
             
-            if data[15][0]:
-                self.labelBidPrice2.setText(str(data[7][0]))
-                self.labelBidPrice3.setText(str(data[8][0]))
-                self.labelBidPrice4.setText(str(data[9][0]))
-                self.labelBidPrice5.setText(str(data[10][0]))
-
-                self.labelAskPrice2.setText(str(data[11][0]))
-                self.labelAskPrice3.setText(str(data[12][0]))
-                self.labelAskPrice4.setText(str(data[13][0]))
-                self.labelAskPrice5.setText(str(data[14][0]))
-            
-                self.labelBidVolume2.setText(str(data[15][0]))
-                self.labelBidVolume3.setText(str(data[16][0]))
-                self.labelBidVolume4.setText(str(data[17][0]))
-                self.labelBidVolume5.setText(str(data[18][0]))
-                
-                self.labelAskVolume2.setText(str(data[19][0]))
-                self.labelAskVolume3.setText(str(data[20][0]))
-                self.labelAskVolume4.setText(str(data[21][0]))
-                self.labelAskVolume5.setText(str(data[22][0]))	
+#             if data[15][0]:
+#                 self.labelBidPrice2.setText(str(data[7][0]))
+#                 self.labelBidPrice3.setText(str(data[8][0]))
+#                 self.labelBidPrice4.setText(str(data[9][0]))
+#                 self.labelBidPrice5.setText(str(data[10][0]))
+# 
+#                 self.labelAskPrice2.setText(str(data[11][0]))
+#                 self.labelAskPrice3.setText(str(data[12][0]))
+#                 self.labelAskPrice4.setText(str(data[13][0]))
+#                 self.labelAskPrice5.setText(str(data[14][0]))
+#             
+#                 self.labelBidVolume2.setText(str(data[15][0]))
+#                 self.labelBidVolume3.setText(str(data[16][0]))
+#                 self.labelBidVolume4.setText(str(data[17][0]))
+#                 self.labelBidVolume5.setText(str(data[18][0]))
+#                 
+#                 self.labelAskVolume2.setText(str(data[19][0]))
+#                 self.labelAskVolume3.setText(str(data[20][0]))
+#                 self.labelAskVolume4.setText(str(data[21][0]))
+#                 self.labelAskVolume5.setText(str(data[22][0]))	
 
             self.labelLastPrice.setText(str(data[4][0]))
-            rt = (float(data[4][0])/float(data[23][0]))-1
+            rt = (float(data[4][0])/float(data[7][0]))-1
             self.labelReturn.setText(('%.2f' %(rt*100))+'%')
 
     #----------------------------------------------------------------------

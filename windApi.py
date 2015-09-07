@@ -59,6 +59,7 @@ class WindApi:
         return w.wsq(security, fields, func=self.onSubscribe)
 
     def onSubscribe(self, indata):
+        print indata
         if indata.ErrorCode == 0:
             
             event = Event(type_=EVENT_LOG)
@@ -100,9 +101,10 @@ class WindApi:
     #交易登录
     def tLogon(self, brokerId, departmentId, accountId, password, accountType):
         LogonID = w.tlogon(brokerId, departmentId, accountId, password, accountType)
+        print LogonID
         if LogonID.ErrorCode != 0:
             event = Event(type_=EVENT_LOG)
-            log = u'登陆错误，错误代码：' + unicode(LogonID.ErrorCode) + u',' + u'错误信息：' + unicode(LogonID.Data[0][0])
+            log = u'登陆错误，'
             event.dict_['log'] = log
             self.__eventEngine.put(event)
         else:
@@ -120,8 +122,8 @@ class WindApi:
         w.tlogout()
 
     # 委托下单
-    def tOrder(self, securityCode, tradeSide, orderPrice, orderVolume, *option):
-        message = w.torder(securityCode, tradeSide, orderPrice, orderVolume, *option)
+    def tOrder(self, securityCode, tradeSide, orderPrice, orderVolume, **option):
+        message = w.torder(securityCode, tradeSide, orderPrice, orderVolume, **option)
         print message
         if message.ErrorCode != 0:
             event = Event(type_=EVENT_LOG)
@@ -135,9 +137,9 @@ class WindApi:
             self.__eventEngine.put(event)
             
             event1 = Event(type_=EVENT_ORDER)
-            #options = 'LogonID='+w.tquery('LogonID').Data[0][0]+';WindCode='+securityCode
-            #ReOrder = w.tquery('Order', options)
-            
+            options = 'LogonID='+w.tquery('LogonID').Data[0][0]+';WindCode='+securityCode
+            ReOrder = w.tquery('Order', options)
+            print ReOrder
             event1.dict_['data'] = message.Data
             
             self.__eventEngine.put(event1)
