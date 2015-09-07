@@ -1032,6 +1032,7 @@ class TradingWidget(QtGui.QWidget):
         labelVolume = QtGui.QLabel(u'数量')
         labelPriceType = QtGui.QLabel(u'价格类型')
 
+
         self.lineID = QtGui.QLineEdit()
         self.lineName = QtGui.QLineEdit()
 
@@ -1052,6 +1053,27 @@ class TradingWidget(QtGui.QWidget):
 
         self.comboPriceType = QtGui.QComboBox()
         self.comboPriceType.addItems(self.dictPriceType.values())
+        
+        self.lineID1 = QtGui.QLineEdit()
+        self.lineName1 = QtGui.QLineEdit()
+
+        self.comboDirection1 = QtGui.QComboBox()
+        self.comboDirection1.addItems(self.dictDirection.values())
+
+        self.comboOffset1 = QtGui.QComboBox()
+        self.comboOffset1.addItems(self.dictOffset.values())
+
+        self.spinPrice1 = QtGui.QDoubleSpinBox()
+        self.spinPrice1.setDecimals(4)
+        self.spinPrice1.setMinimum(0)
+        self.spinPrice1.setMaximum(10000)
+
+        self.spinVolume1 = QtGui.QSpinBox()
+        self.spinVolume1.setMinimum(0)
+        self.spinVolume1.setMaximum(1000000)
+
+        self.comboPriceType1 = QtGui.QComboBox()
+        self.comboPriceType1.addItems(self.dictPriceType.values())
 
         gridleft = QtGui.QGridLayout()
         gridleft.addWidget(labelID, 0, 0)
@@ -1068,6 +1090,13 @@ class TradingWidget(QtGui.QWidget):
         gridleft.addWidget(self.spinPrice, 4, 1)
         gridleft.addWidget(self.spinVolume, 5, 1)
         gridleft.addWidget(self.comboPriceType, 6, 1)	
+        gridleft.addWidget(self.lineID1, 0, 2)
+        gridleft.addWidget(self.lineName1, 1, 2)
+        gridleft.addWidget(self.comboDirection1, 2, 2)
+        gridleft.addWidget(self.comboOffset1, 3, 2)
+        gridleft.addWidget(self.spinPrice1, 4, 2)
+        gridleft.addWidget(self.spinVolume1, 5, 2)
+        gridleft.addWidget(self.comboPriceType1, 6, 2)    
 
         # 右边部分
         labelBid1 = QtGui.QLabel(u'买一')
