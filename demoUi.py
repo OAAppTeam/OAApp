@@ -15,6 +15,7 @@ import sys
 import shelve
 from collections import OrderedDict
 
+import time
 import sip
 from PyQt4 import QtCore, QtGui
 
@@ -444,15 +445,21 @@ class OrderMonitor(QtGui.QTableWidget):
         """"""
         data = event.dict_['data']
         orderSysID = data[0][0]
-        options = 'LogonID='+str(self.__mainEngine.wa.tQuery('LogonID').Data[0][0])+';RequestID='+str(orderSysID)+';showfields=OrderNumber,OrderStatus,OrderTime,TradeVolume'
+        options = 'LogonID='+str(self.__mainEngine.wa.tQuery('LogonID').Data[0][0])+';RequestID='+str(orderSysID)+';showfields=OrderNumber,OrderStatus,TradedVolume,OrderTime,SecurityName'
         message = self.__mainEngine.wa.tQuery('Order', options)
+        print u'报单'
         print message
-        ordernum = message.Data[0][0]
-        self.dictOrderData[orderSysID] = data
+        orderref = message[0][0]
+        #options = 'LogonID='+str(self.__mainEngine.wa.tQuery('LogonID').Data[0][0])+';WindCode='+str(event.dict_['code'])
+        #ReOrder = self.__mainEngine.wa.tQuery('Order', options)
+        #print ReOrder
+        
+        
+        self.dictOrderData[orderref] = data
 
         # 如果之前已经收到过这个账户的数据, 则直接更新
-        if orderSysID in self.dictOrder:
-            d = self.dictOrder[orderSysID]
+        if orderref in self.dictOrder:
+            d = self.dictOrder[orderref]
 
             for label, cell in d.items():
                 if label == 'OrderRef':
@@ -462,7 +469,7 @@ class OrderMonitor(QtGui.QTableWidget):
                         value = u'未知类型'
                 elif label == 'OrderSysID':
                     try:
-                        value = data[0][0]
+                        value = str(orderSysID)
                     except KeyError:
                         value = u'未知类型'
                         
@@ -473,7 +480,7 @@ class OrderMonitor(QtGui.QTableWidget):
                         value = u'未知类型'  
                 elif label == 'ExchangeInstID':
                     try:
-                        value = ''
+                        value = message.Data[4][0]
                     except KeyError:
                         value = u'未知类型'  
                 elif label == 'Direction':
@@ -516,17 +523,17 @@ class OrderMonitor(QtGui.QTableWidget):
                 elif label == 'VolumeTotalOriginal':
                     value = data[4][0]
                 
-#                 elif label == 'VolumeTraded':
-#                     value = str(message[3][0])
-#                 
+                elif label == 'VolumeTraded':
+                    value = str(message.Data[2][0])
+                 
                 elif label == 'InsertTime':
-                    value = str(message[2][0])
-                
+                    value = str(message.Data[3][0])
+                 
                 elif label == 'CancelTime':
                     value = ''
-                
+                 
                 elif label == 'StatusMsg':
-                    value = str(message[1][0])
+                    value = str(message.Data[1][0])
                 cell.setText(value)
                 
            # 否则插入新的一行，并更新
@@ -538,12 +545,13 @@ class OrderMonitor(QtGui.QTableWidget):
             for col, label in enumerate(self.dictLabels.keys()):
                 if label == 'OrderRef':
                     try:
+                        
                         value = str(message.Data[0][0])
                     except KeyError:
                         value = u'未知类型'
                 elif label == 'OrderSysID':
                     try:
-                        value = data[0][0]
+                        value = str(orderSysID)
                     except KeyError:
                         value = u'未知类型'
                         
@@ -554,7 +562,7 @@ class OrderMonitor(QtGui.QTableWidget):
                         value = u'未知类型'  
                 elif label == 'ExchangeInstID':
                     try:
-                        value = ''
+                        value = message.Data[4][0]
                     except KeyError:
                         value = u'未知类型'  
                 elif label == 'Direction':
@@ -598,41 +606,59 @@ class OrderMonitor(QtGui.QTableWidget):
                     value = data[4][0]
                 
 
-#                 elif label == 'VolumeTraded':
-#                     value = str(message[3][0])
-#                 
-#                 elif label == 'InsertTime':
-#                     value =str( message[2][0])
-#                 
-#                 elif label == 'CancelTime':
-#                     value = ''
-#                 
-#                 elif label == 'StatusMsg':
-#                     value = str(message[1][0])
+                elif label == 'VolumeTraded':
+                    value = str(message.Data[2][0])
+                 
+                elif label == 'InsertTime':
+                    value =str( message.Data[3][0])
+                 
+                elif label == 'CancelTime':
+                    value = ''
+                 
+                elif label == 'StatusMsg':
+                    value = str(message.Data[1][0])
                 
                 cell = QtGui.QTableWidgetItem(value)
                 self.setItem(0, col, cell)
                 d[label] = cell
 
-                cell.orderSysID =	orderSysID    # 动态绑定报单号到单元格上
+                cell.orderref =	message.Data[0][0]   # 动态绑定报单号到单元格上
 
-            self.dictOrder[orderSysID] = d
+            self.dictOrder[orderref] = d
     
     #----------------------------------------------------------------------
     def cancelOrder(self, cell):
         """双击撤单"""
-        options = 'LogonID='+self.__mainEngine.wa.tQuery('LogonID').Data[0][0]
-        orderref = cell.orderref
-        order = self.dictOrderData[orderref]
-
+        logonID = self.__mainEngine.wa.tQuery('LogonID').Data[0][0]
+        options1 = 'LogonID='+str(logonID)+';OrderType=Withdrawable'
+        withOrder = self.__mainEngine.wa.tQuery('Order',options1)
+        print 'withOrder'
+        print withOrder
+        
+        orderref = str(cell.orderref)
         # 撤单前检查报单是否已经撤销或者全部成交
-        if not (order['OrderStatus'] == '0' or order['OrderStatus'] == '5'):
-            self.__mainEngine.cancelOrder(order['InstrumentID'],
-                                          order['ExchangeID'],
-                                          orderref,
-                                          order['FrontID'],
-                                          order['SessionID'])
-
+        print u'可撤',orderref,withOrder.Data[0]
+        if orderref in withOrder.Data[0]:
+            self.__mainEngine.wa.tCancel(orderref,'LogonID='+str(logonID))
+        
+        options =   "LogonId=" + str(self.__mainEngine.wa.tQuery('LogonID').Data[0][0])+';OrderNumber='+orderref
+        ReOrder = self.__mainEngine.wa.tQuery('Order',options)
+        
+        if ReOrder[1][0] == 'Cancelled':
+            d = self.dictOrder[cell.orderref]
+    
+            for label, cell in d.items():
+                if label == 'CancelTime':
+                    try:
+                        value = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time())) 
+                    except KeyError:
+                        value = u'未知类型'
+                elif label == 'StatusMsg':
+                    try:
+                        value = 'Cancelled'
+                    except KeyError:
+                        value = u'未知类型'      
+                cell.setText(value)
     #----------------------------------------------------------------------
     def cancelAll(self):
         """全撤"""
@@ -699,11 +725,10 @@ class MarketDataMonitor(QtGui.QTableWidget):
     #----------------------------------------------------------------------
     def updateData(self, event):
         """"""
-        print '行情'
         data = event.dict_['data']
         time = event.dict_['time'][0]
         instrumentid = event.dict_['code'][0]
-        
+        field = event.dict_['field']
 
         # 如果之前已经收到过这个账户的数据, 则直接更新
         if instrumentid in self.dictData:
@@ -711,31 +736,45 @@ class MarketDataMonitor(QtGui.QTableWidget):
 
             for label, cell in d.items():
                 if label == 'InstrumentID':
+                    
                     value = str(instrumentid)                    
                     
                 elif label=='Name':
                     value = ''                
                     
-                elif label=='ExchangeInstID':
-                    value = str(instrumentid)                    
+                                
                     
                 elif label=='BidPrice1':
-                    value = str(data[0][0])                    
+                    for k in range(0,len(field)):
+                        if field[k] == 'RT_BID1':
+                            value = str(data[k][0])                    
+                    
                     
                 elif label=='BidVolume1':
-                    value = str(data[1][0])                    
+                    for k in range(0,len(field)):
+                        if field[k] == 'RT_BSIZE1':
+                            value = str(data[k][0])                       
                     
                 elif label=='AskPrice1':
-                    value = str(data[2][0])                    
+                    for k in range(0,len(field)):
+                        if field[k] == 'RT_ASK1':
+                            value = str(data[k][0])                        
                     
                 elif label=='AskVolume1':
-                    value = str(data[3][0])                    
-                
+                    for k in range(0,len(field)):
+                        if field[k] == 'RT_ASIZE1':
+                            value = str(data[k][0])                        
+                    
                 elif label=='Volume':
-                    value = str(data[4][0]) 
+                    for k in range(0,len(field)):
+                        if field[k] == 'RT_VOL':
+                            value = str(data[k][0])                        
                     
                 elif label=='LastPrice':
-                    value = str(data[5][0])                    
+                    for k in range(0,len(field)):
+                        if field[k] == 'LATEST':
+                            value = str(data[k][0])                        
+                                      
                     
                 elif label=='UpdateTime':
                     value = str(time)                    
@@ -759,38 +798,46 @@ class MarketDataMonitor(QtGui.QTableWidget):
                     cell = QtGui.QTableWidgetItem(name)	
                     self.setItem(row, col, cell)
                     d[label] = cell
-                elif label=='ExchangeInstID':
-                    value = str(instrumentid)                    
-                    cell = QtGui.QTableWidgetItem(value)
-                    self.setItem(row, col, cell)
-                    d[label] = cell
+                
                 elif label=='BidPrice1':
-                    value = str(data[0][0])                    
+                    for k in range(0,len(field)):
+                        if field[k] == 'RT_BID1':
+                            value = str(data[k][0])                    
                     cell = QtGui.QTableWidgetItem(value)
                     self.setItem(row, col, cell)
                     d[label] = cell
                 elif label=='BidVolume1':
-                    value = str(data[1][0])                    
+                    for k in range(0,len(field)):
+                        if field[k] == 'RT_BSIZE1':
+                            value = str(data[k][0])                       
                     cell = QtGui.QTableWidgetItem(value)
                     self.setItem(row, col, cell)
                     d[label] = cell
                 elif label=='AskPrice1':
-                    value = str(data[2][0])                    
+                    for k in range(0,len(field)):
+                        if field[k] == 'RT_ASK1':
+                            value = str(data[k][0])                        
                     cell = QtGui.QTableWidgetItem(value)
                     self.setItem(row, col, cell)
                     d[label] = cell
                 elif label=='AskVolume1':
-                    value = str(data[3][0])                    
+                    for k in range(0,len(field)):
+                        if field[k] == 'RT_ASIZE1':
+                            value = str(data[k][0])                        
                     cell = QtGui.QTableWidgetItem(value)
                     self.setItem(row, col, cell)
                     d[label] = cell
                 elif label=='Volume':
-                    value = str(data[5][0])                    
+                    for k in range(0,len(field)):
+                        if field[k] == 'RT_VOL':
+                            value = str(data[k][0])                        
                     cell = QtGui.QTableWidgetItem(value)
                     self.setItem(row, col, cell)
                     d[label] = cell
                 elif label=='LastPrice':
-                    value = str(data[4][0])                    
+                    for k in range(0,len(field)):
+                        if field[k] == 'LATEST':
+                            value = str(data[k][0])                        
                     cell = QtGui.QTableWidgetItem(value)
                     self.setItem(row, col, cell)
                     d[label] = cell
@@ -1251,12 +1298,18 @@ class TradingWidget(QtGui.QWidget):
         data = event.dict_['data']
         time = event.dict_['time'][0]
         instrumentid = event.dict_['code'][0]
-        
+        field = event.dict_['field']
+        latest = 0
         if instrumentid == self.instrumentid:
-            self.labelBidPrice1.setText(str(data[0][0]))
-            self.labelAskPrice1.setText(str(data[2][0]))
-            self.labelBidVolume1.setText(str(data[1][0]))
-            self.labelAskVolume1.setText(str(data[3][0]))
+            for k in range(0,len(field)):
+                if field[k] == 'RT_BID1':
+                    self.labelBidPrice1.setText(str(data[k][0]))
+                elif field[k] == 'RT_ASK1':
+                    self.labelAskPrice1.setText(str(data[k][0]))
+                elif field[k] == 'RT_BSIZE1':
+                    self.labelBidVolume1.setText(str(data[k][0]))
+                elif field[k] == 'RT_ASIZE1':
+                    self.labelAskVolume1.setText(str(data[k][0]))
             
 #             if data[15][0]:
 #                 self.labelBidPrice2.setText(str(data[7][0]))
@@ -1278,10 +1331,12 @@ class TradingWidget(QtGui.QWidget):
 #                 self.labelAskVolume3.setText(str(data[20][0]))
 #                 self.labelAskVolume4.setText(str(data[21][0]))
 #                 self.labelAskVolume5.setText(str(data[22][0]))	
-
-            self.labelLastPrice.setText(str(data[4][0]))
-            rt = (float(data[4][0])/float(data[7][0]))-1
-            self.labelReturn.setText(('%.2f' %(rt*100))+'%')
+                elif field[k] == 'RT_LATEST':
+                    self.labelLastPrice.setText(str(data[k][0]))
+                    latest=data[k][0]
+                elif field[k] == 'RT_PRE_CLOSE':
+                    rt = (float(latest)/float(data[k][0]))-1
+                    self.labelReturn.setText(('%.2f' %(rt*100))+'%')
 
     #----------------------------------------------------------------------
     def registerEvent(self):

@@ -59,7 +59,7 @@ class WindApi:
         return w.wsq(security, fields, func=self.onSubscribe)
 
     def onSubscribe(self, indata):
-        print indata
+        #print indata
         if indata.ErrorCode == 0:
             
             event = Event(type_=EVENT_LOG)
@@ -73,11 +73,13 @@ class WindApi:
             event.dict_['data'] = indata.Data
             event.dict_['code'] = indata.Codes
             event.dict_['time'] = indata.Times
+            event.dict_['field'] = indata.Fields
             self.__eventEngine.put(event)
             event = Event(type_=EVENT_MARKETDATA_CONTRACT)
             event.dict_['data'] = indata.Data
             event.dict_['code'] = indata.Codes
             event.dict_['time'] = indata.Times
+            event.dict_['field'] = indata.Fields
             self.__eventEngine.put(event)
         else:
             event = Event(type_=EVENT_LOG)
@@ -137,21 +139,26 @@ class WindApi:
             self.__eventEngine.put(event)
             
             event1 = Event(type_=EVENT_ORDER)
-            options = 'LogonID='+w.tquery('LogonID').Data[0][0]+';WindCode='+securityCode
+            options = 'LogonID='+str(w.tquery('LogonID').Data[0][0])+';WindCode='+str(securityCode)
             ReOrder = w.tquery('Order', options)
-            print ReOrder
+            #print ReOrder
             event1.dict_['data'] = message.Data
-            
+            event1.dict_['code'] = securityCode
             self.__eventEngine.put(event1)
             
 
     # 撤销委托
     def tCancel(self, orderNum, *option):
-        w.tcancel(orderNum, *option)
+        reCancel = w.tcancel(orderNum, *option)
+        
 
     # 交易查询
     def tQuery(self, qryCode, *option):
         if qryCode == 'LogonID':
+            return w.tquery(qryCode, *option)
+        elif qryCode == 'Order':
+            return w.tquery(qryCode, *option)
+        elif qryCode == 'Trade':
             return w.tquery(qryCode, *option)
         elif qryCode == 'Account':
             data = w.tquery(qryCode, *option)

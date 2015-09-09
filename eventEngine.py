@@ -195,8 +195,6 @@ def test():
     ee = EventEngine()
     # ee.register(EVENT_TIMER, simpletest)
 
-    from wsqsave import loop, myCallback
-    loop()
 
     ee.start()
     
