@@ -149,7 +149,7 @@ class WindApi:
 
     # 撤销委托
     def tCancel(self, orderNum, *option):
-        reCancel = w.tcancel(orderNum, *option)
+        w.tcancel(orderNum, *option)
         
 
     # 交易查询

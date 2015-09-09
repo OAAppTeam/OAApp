@@ -215,7 +215,7 @@ class TradeMonitor(QtGui.QTableWidget):
         """Constructor"""
         super(TradeMonitor, self).__init__(parent)
         self.__eventEngine = eventEngine
-
+        self.dictTrade={}
         self.initUi()
         self.registerEvent()	
 
@@ -234,32 +234,230 @@ class TradeMonitor(QtGui.QTableWidget):
     def registerEvent(self):
         """"""
         self.signal.connect(self.updateTrade)
-        self.__eventEngine.register(EVENT_TRADE, self.signal.emit)
+        self.__eventEngine.register(EVENT_TIMER, self.signal.emit)
 
     #----------------------------------------------------------------------
-    def updateTrade(self, event):
+    def updateTrade(self):
         """"""
-        data = event.dict_['data']
-
-        self.insertRow(0)
-
-        for col, label in enumerate(self.dictLabels.keys()):
-            if label == 'Direction':
-                try:
-                    value = self.dictDirection[data[label]]
-                except KeyError:
-                    value = u'未知类型'
-            elif label == 'OffsetFlag':
-                try:
-                    value = self.dictOffset[data[label]]
-                except KeyError:
-                    value = u'未知类型'
+        
+        
+        logonID = str(self.__mainEngine.wa.tQuery('LogonID').Data[0][0])
+        tradeinfo = self.__mainEngine.wa.tQuery('Trade','LogonID='+str(logonID))
+        data = tradeinfo.Data
+        field = tradeinfo.Fields
+        ordernum = tradeinfo.Data[0]
+        
+        for i in range(0,len(ordernum)):
+            onum  = ordernum[i]
+            if onum in self.dictTrade:
+                d = self.dictTrade[onum]
+                for label, cell in d.items():
+                    if label == 'InstrumentID':
+                        try:
+                            for k in range(0,len(field)):
+                                if field[k] == 'SecurityCode':
+                                    value = data[k][i]                           
+                        except KeyError:
+                            value = u'未知类型'
+                    elif label == 'ExchangeInstID':
+                        try:
+                            for k in range(0,len(field)):
+                                if field[k] == 'SecurityName':
+                                    value = data[k][i]
+                        except KeyError:
+                            value = u'未知类型'
+                    elif label == 'ExchangeID':
+                        try:
+                            value = ''
+                        except KeyError:
+                            value = u'未知类型'
+                    elif label == 'Direction':
+                        try:
+                            for k in range(0,len(field)):
+                                if field[k] == 'TradeSide':
+                                    value = data[k][i]
+                                    if value == 'BUY':
+                                        value = u'买'
+                                    elif value == 'SHORT':
+                                        value = u'卖'
+                                    elif value == 'COVER':
+                                        value = u'买'
+                                    elif value == 'SELL':
+                                        value = u'卖'
+                                    elif value == 'COVERTODAY':
+                                        value = u'买'
+                                    elif value == 'SELLTODAY':
+                                        value = u'卖'
+                        except KeyError:
+                            value = u'未知类型'
+                    elif label == 'OffsetFlag':
+                        try:
+                            for k in range(0,len(field)):
+                                if field[k] == 'TradeSide':
+                                    value = data[k][i]
+                                    if value == 'BUY':
+                                        value = u'开仓'
+                                    elif value == 'SHORT':
+                                        value = u'开仓'
+                                    elif value == 'COVER':
+                                        value = u'平仓'
+                                    elif value == 'SELL':
+                                        value = u'平仓'
+                                    elif value == 'COVERTODAY':
+                                        value = u'平今仓'
+                                    elif value == 'SELLTODAY':
+                                        value = u'平今仓'
+                        except KeyError:
+                            value = u'未知类型'
+                    elif label == 'TradeID':
+                        try:
+                            for k in range(0,len(field)):
+                                if field[k] == 'TradedNumber':
+                                    value = data[k][i]
+                        except KeyError:
+                            value = u'未知类型'        
+                    elif label == 'TradeTime':
+                        try:
+                            for k in range(0,len(field)):
+                                if field[k] == 'TradedTime':
+                                    value = data[k][i]
+                        except KeyError:
+                            value = u'未知类型'
+                    elif label == 'Volume':
+                        try:
+                            for k in range(0,len(field)):
+                                if field[k] == 'TradedVolume':
+                                    value = data[k][i]
+                        except KeyError:
+                            value = u'未知类型'
+                    elif label == 'Price':
+                        try:
+                            for k in range(0,len(field)):
+                                if field[k] == 'TradedPrice':
+                                    value = data[k][i]
+                        except KeyError:
+                            value = u'未知类型'        
+                    elif label == 'OrderRef':
+                        try:
+                            for k in range(0,len(field)):
+                                if field[k] == 'OrderNumber':
+                                    value = data[k][i]
+                        except KeyError:
+                            value = u'未知类型'
+                    elif label == 'OrderSysID':
+                        try:
+                            value =''
+                        except KeyError:
+                            value = u'未知类型'
+                 
+                    cell.setText(value)   
             else:
-                value = str(data[label])
-
-            cell = QtGui.QTableWidgetItem(value)
-            self.setItem(0, col, cell)
-
+                self.insertRow(0)
+                d={}
+                for col, label in enumerate(self.dictLabels.keys()):
+                    if label == 'InstrumentID':
+                        try:
+                            for k in range(0,len(field)):
+                                if field[k] == 'SecurityCode':
+                                    value = data[k][i]                           
+                        except KeyError:
+                            value = u'未知类型'
+                    elif label == 'ExchangeInstID':
+                        try:
+                            for k in range(0,len(field)):
+                                if field[k] == 'SecurityName':
+                                    value = data[k][i]
+                        except KeyError:
+                            value = u'未知类型'
+                    elif label == 'ExchangeID':
+                        try:
+                            value = ''
+                        except KeyError:
+                            value = u'未知类型'
+                    elif label == 'Direction':
+                        try:
+                            for k in range(0,len(field)):
+                                if field[k] == 'TradeSide':
+                                    value = data[k][i]
+                                    if value == 'BUY':
+                                        value = u'买'
+                                    elif value == 'SHORT':
+                                        value = u'卖'
+                                    elif value == 'COVER':
+                                        value = u'买'
+                                    elif value == 'SELL':
+                                        value = u'卖'
+                                    elif value == 'COVERTODAY':
+                                        value = u'买'
+                                    elif value == 'SELLTODAY':
+                                        value = u'卖'
+                        except KeyError:
+                            value = u'未知类型'
+                    elif label == 'OffsetFlag':
+                        try:
+                            for k in range(0,len(field)):
+                                if field[k] == 'TradeSide':
+                                    value = data[k][i]
+                                    if value == 'BUY':
+                                        value = u'开仓'
+                                    elif value == 'SHORT':
+                                        value = u'开仓'
+                                    elif value == 'COVER':
+                                        value = u'平仓'
+                                    elif value == 'SELL':
+                                        value = u'平仓'
+                                    elif value == 'COVERTODAY':
+                                        value = u'平今仓'
+                                    elif value == 'SELLTODAY':
+                                        value = u'平今仓'
+                        except KeyError:
+                            value = u'未知类型'
+                    elif label == 'TradeID':
+                        try:
+                            for k in range(0,len(field)):
+                                if field[k] == 'TradedNumber':
+                                    value = data[k][i]
+                        except KeyError:
+                            value = u'未知类型'        
+                    elif label == 'TradeTime':
+                        try:
+                            for k in range(0,len(field)):
+                                if field[k] == 'TradedTime':
+                                    value = data[k][i]
+                        except KeyError:
+                            value = u'未知类型'
+                    elif label == 'Volume':
+                        try:
+                            for k in range(0,len(field)):
+                                if field[k] == 'TradedVolume':
+                                    value = data[k][i]
+                        except KeyError:
+                            value = u'未知类型'
+                    elif label == 'Price':
+                        try:
+                            for k in range(0,len(field)):
+                                if field[k] == 'TradedPrice':
+                                    value = data[k][i]
+                        except KeyError:
+                            value = u'未知类型'        
+                    elif label == 'OrderRef':
+                        try:
+                            for k in range(0,len(field)):
+                                if field[k] == 'OrderNumber':
+                                    value = data[k][i]
+                        except KeyError:
+                            value = u'未知类型'
+                    elif label == 'OrderSysID':
+                        try:
+                            value =''
+                        except KeyError:
+                            value = u'未知类型'
+                    
+        
+                    cell = QtGui.QTableWidgetItem(value)
+                    self.setItem(0, col, cell)
+                    d[label] = cell
+                    self.dictTrade[onum] = d
 
 ########################################################################
 class PositionMonitor(QtGui.QTableWidget):
