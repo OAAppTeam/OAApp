@@ -103,7 +103,7 @@ class WindApi:
     #交易登录
     def tLogon(self, brokerId, departmentId, accountId, password, accountType):
         LogonID = w.tlogon(brokerId, departmentId, accountId, password, accountType)
-        print LogonID
+        # print LogonID
         if LogonID.ErrorCode != 0:
             event = Event(type_=EVENT_LOG)
             log = u'登陆错误，'
@@ -161,17 +161,15 @@ class WindApi:
         elif qryCode == 'Trade':
             return w.tquery(qryCode, *option)
         elif qryCode == 'Account':
-            data = w.tquery(qryCode, *option)
+            data = w.tquery('Capital', *option)
             event = Event(type_=EVENT_ACCOUNT)
             event.dict_['data'] = data
             self.__eventEngine.put(event)
-            print 'account done'
         elif qryCode == 'Position':
             data = w.tquery(qryCode, *option)
             event = Event(type_=EVENT_POSITION)
             event.dict_['data'] = data
             self.__eventEngine.put(event)
-            print 'position done'
 
     # 日期函数
 

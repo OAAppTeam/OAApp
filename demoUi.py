@@ -87,18 +87,16 @@ class AccountMonitor(QtGui.QTableWidget):
     signal = QtCore.pyqtSignal(type(Event()))
 
     dictLabels = OrderedDict()
-    dictLabels['AccountID'] = u'投资者账户'
-    dictLabels['PreBalance'] = u'昨结'
-    dictLabels['Withdraw'] = u'出金'
-    dictLabels['Deposit'] = u'入金'    
-    dictLabels['FrozenCash'] = u'冻结资金'
-    dictLabels['FrozenMargin'] = u'冻结保证金'
-    dictLabels['FrozenCommission'] = u'冻结手续费'
-    dictLabels['Commission'] = u'手续费'
-    dictLabels['CurrMargin'] = u'当前保证金'
-    dictLabels['Available'] = u'可用资金'
-    dictLabels['WithdrawQuota'] = u'可取资金'
-    dictLabels['Balance'] = u'账户资金'
+    dictLabels['AssetAccount'] = u'投资者账户'
+    dictLabels['AvailableFund'] = u'可用资金'
+    dictLabels['BalanceFund'] = u'资金余额'
+    dictLabels['FetchFund'] = u'可取资金'
+    dictLabels['ExerciseMargin'] = u'履约保证金'
+    dictLabels['RealFrozenMarginA'] = u'开仓预冻结金额'
+    dictLabels['RealFrozenMarginB'] = u'开仓预冻结保证金和费用'
+    dictLabels['FrozenFare'] = u'冻结费用'
+    dictLabels['CustomerMargin'] = u'客户保证金'
+    dictLabels['Interest'] = u'预计利息'
 
     #----------------------------------------------------------------------
     def __init__(self, eventEngine, parent=None):
@@ -132,21 +130,23 @@ class AccountMonitor(QtGui.QTableWidget):
     def updateAccount(self, event):
         """"""
         data = event.dict_['data']
-        accountid = data['AccountID']
+        fields = data.Fields
+        datas = data.Data
+        accountid = datas[fields.index('AssetAccount')][0]
 
         # 如果之前已经收到过这个账户的数据, 则直接更新
         if accountid in self.dictAccount:
             d = self.dictAccount[accountid]
 
             for label, cell in d.items():
-                cell.setText(str(data[label]))
+                cell.setText(str(datas[fields.index(label)][0]))
         # 否则插入新的一行，并更新
         else:
             self.insertRow(0)
             d = {}
 
             for col, label in enumerate(self.dictLabels.keys()):
-                cell = QtGui.QTableWidgetItem(str(data[label]))
+                cell = QtGui.QTableWidgetItem(str(datas[fields.index(label)][0]))
                 self.setItem(0, col, cell)
                 d[label] = cell
 
@@ -267,18 +267,17 @@ class PositionMonitor(QtGui.QTableWidget):
     signal = QtCore.pyqtSignal(type(Event()))
 
     dictLabels = OrderedDict()
-    dictLabels['InstrumentID'] = u'合约代码'
-    dictLabels['PosiDirection'] = u'方向'  
-    dictLabels['Position'] = u'持仓'
-    dictLabels['LongFrozen'] = u'多头冻结'
-    dictLabels['ShortFrozen'] = u'空头冻结'
-    dictLabels['PositionCost'] = u'持仓成本'
-    dictLabels['OpenCost'] = u'开仓成本'
-
-    dictPosiDirection = {}
-    dictPosiDirection['1'] = u'净'
-    dictPosiDirection['2'] = u'多'
-    dictPosiDirection['3'] = u'空'
+    dictLabels['SecurityName'] = u'交易品种名称'
+    dictLabels['CostPrice'] = u'成本价'
+    dictLabels['LastPrice'] = u'最新价'
+    dictLabels['TradeSide'] = u'买/卖'
+    dictLabels['BeginVolume'] = u'期初数量'
+    dictLabels['EnableVolume'] = u'可用数量'
+    dictLabels['TodayRealVolume'] = u'当日可平仓数量'
+    dictLabels['TodayOpenVolume'] = u'当日开仓可用数量'
+    dictLabels['HoldingProfit'] = u'盯市盈亏'
+    dictLabels['TotalFloatProfit'] = u'持仓浮动盈亏'
+    dictLabels['PreMargin'] = u'上交易日保证金'
 
     #----------------------------------------------------------------------
     def __init__(self, eventEngine, parent=None):
@@ -312,23 +311,18 @@ class PositionMonitor(QtGui.QTableWidget):
     def updatePosition(self, event):
         """"""
         data = event.dict_['data']
-        print data
+        fields = data.Fields
+        datas = data.Data
         # 过滤返回值为空的情况
-        if data['InstrumentID']:
-            posid = data['InstrumentID'] + '.' + data['PosiDirection']
+        if datas[fields.index('SecurityName')][0]:
+            posid = datas[fields.index('SecurityName')][0] + '.' + datas[fields.index('TradeSide')][0]
 
             # 如果之前已经收到过这个账户的数据, 则直接更新
             if posid in self.dictPosition:
                 d = self.dictPosition[posid]
 
                 for label, cell in d.items():
-                    if label == 'PosiDirection':
-                        try:
-                            value = self.dictPosiDirection[data[label]]
-                        except KeyError:
-                            value = u'未知类型'
-                    else:
-                        value = str(data[label])	
+                    value = str(datas[fields.index(label)][0])
                     cell.setText(value)
             # 否则插入新的一行，并更新
             else:
@@ -336,14 +330,7 @@ class PositionMonitor(QtGui.QTableWidget):
                 d = {}
 
                 for col, label in enumerate(self.dictLabels.keys()):
-                    if label == 'PosiDirection':
-                        try:
-                            value = self.dictPosiDirection[data[label]]
-                        except KeyError:
-                            value = u'未知类型'
-                    else:
-                        value = str(data[label])
-                    cell = QtGui.QTableWidgetItem(value)
+                    cell = QtGui.QTableWidgetItem(datas[fields.index(label)][0])
                     self.setItem(0, col, cell)
                     d[label] = cell
 

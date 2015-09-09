@@ -15,7 +15,7 @@ class MainEngine:
         # 循环查询持仓和账户相关
         self.countGet = 0               # 查询延时计数
         self.lastGet = 'Account'        # 上次查询的性质
-#         self.ee.register(EVENT_TLOGON, self.initGet)  # 登录成功后开始初始化查询
+        self.ee.register(EVENT_TLOGON, self.initGet)  # 登录成功后开始初始化查询
 
         # 合约储存相关
         self.dictInstrument = {}        # 字典（保存合约查询数据）
