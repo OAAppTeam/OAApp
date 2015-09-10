@@ -103,7 +103,7 @@ class WindApi:
     #交易登录
     def tLogon(self, brokerId, departmentId, accountId, password, accountType):
         LogonID = w.tlogon(brokerId, departmentId, accountId, password, accountType)
-        # print LogonID
+        print LogonID
         if LogonID.ErrorCode != 0:
             event = Event(type_=EVENT_LOG)
             log = u'登陆错误，'
@@ -146,7 +146,8 @@ class WindApi:
             event1.dict_['code'] = securityCode
             self.__eventEngine.put(event1)
             
-
+            event2 = Event(type_=EVENT_TRADE)
+            self.__eventEngine.put(event2)
     # 撤销委托
     def tCancel(self, orderNum, *option):
         w.tcancel(orderNum, *option)
