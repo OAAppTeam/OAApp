@@ -26,21 +26,35 @@ class MACDApi:
 
      # 获得想要的收盘价(将一些脏数据过滤掉，例如'nan')
     def get_close_value(self):
-        table = xlrd.open_workbook(self.__var1+".xlsx").sheets()[0]
-        result_list = []
-        time_col = table.col_values(0)[1:]
-        close_col = table.col_values(4)[1:]
-        time = []
-        for i in range(len(time_col)):
-            temp = xlrd.xldate_as_tuple(time_col[i],0)
-            time.append(datetime.datetime(temp[0],temp[1],temp[2],temp[3],temp[4]))
-        # 根据时间来筛选数据
-        for j in range(len(time_col)):
-            if self.__start_date > time[j]:
-                j = j + 1
-            else:
-                break
-        return close_col[j:]
+        table_1 = xlrd.open_workbook(self.__var1+".xlsx").sheets()[0]
+        time_col_1 = table_1.col_values(0)[1:]
+        close_col_1 = table_1.col_values(4)[1:]
+        time_1 = []
+        for i in range(len(time_col_1)):
+            temp = xlrd.xldate_as_tuple(time_col_1[i],0)
+            time_1.append(datetime.datetime(temp[0],temp[1],temp[2],temp[3],temp[4]))
+        if self.__var2 == None:
+            # 根据时间来筛选数据
+            for j in range(len(time_col_1)):
+                if self.__start_date > time_1[j]:
+                    j = j + 1
+                else:
+                    break
+            return close_col_1[j:]
+        else:
+            table_2 = xlrd.open_workbook(self.__var2+".xlsx").sheets()[0]
+            time_col_2 = table_2.col_values(0)[1:]
+            close_col_2 = table_2.col_values(4)[1:]
+            time_2 = []
+            for k in range(len(time_col_2)):
+                temp = xlrd.xldate_as_tuple(time_col_2[k],0)
+                time_2.append(datetime.datetime(temp[0],temp[1],temp[2],temp[3],temp[4]))
+            for m in range(len(time_col_2)):
+                if self.__start_date > time_2[m]:
+                    m = m + 1
+                else:
+                    break
+            return (np.array(close_col_1[m:]) - np.array(close_col_2[m:])).tolist()
 
     # 获得到今天为止长期（26）天的 ema
     def cal_longterm_EMA(self):
@@ -94,7 +108,7 @@ class MACDApi:
             result_list.append(temp)
         return result_list
 
-    # 做出交易决定
+    # 得出交易的大小
     def do_operate(self):
         operate = 0
         m_DIF = self.cal_DIF()
@@ -108,9 +122,17 @@ class MACDApi:
             if m_DIF[i] < 0 and m_DEA[i] < 0 and m_DIF[i] < m_DEA[i] :
                 operate = operate - 10
         return operate
+    # 做出交易
+    def make_trade(self):
+        num = self.do_operate()
+        if num > 0:
+            dic = 'buy'
+        else:
+            dic = 'sale'
 
 macd = MACDApi("2015-09-11 9:00:00","IF1509")
 print macd.get_close_value()
+print macd.do_operate()
 
 
 
