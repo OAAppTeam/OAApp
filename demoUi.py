@@ -872,7 +872,7 @@ class MarketDataMonitor(QtGui.QTableWidget):
     signal = QtCore.pyqtSignal(type(Event()))
 
     dictLabels = OrderedDict()
-    dictLabels['Name'] = u'合约名称'
+#     dictLabels['Name'] = u'合约名称'
     dictLabels['InstrumentID'] = u'合约代码'
     dictLabels['ExchangeInstID'] = u'合约交易所代码'
 
@@ -933,8 +933,8 @@ class MarketDataMonitor(QtGui.QTableWidget):
                     
                     value = str(instrumentid)                    
                     
-                elif label=='Name':
-                    value = ''                
+#                 elif label=='Name':
+#                     value = ''                
                     
                                 
                     
@@ -987,11 +987,11 @@ class MarketDataMonitor(QtGui.QTableWidget):
                     cell = QtGui.QTableWidgetItem(value)
                     self.setItem(row, col, cell)
                     d[label] = cell
-                elif label=='Name':
-                    name = ''			    
-                    cell = QtGui.QTableWidgetItem(name)	
-                    self.setItem(row, col, cell)
-                    d[label] = cell
+#                 elif label=='Name':
+#                     name = ''			    
+#                     cell = QtGui.QTableWidgetItem(name)	
+#                     self.setItem(row, col, cell)
+#                     d[label] = cell
                 
                 elif label=='BidPrice1':
                     for k in range(0,len(field)):
@@ -1083,6 +1083,7 @@ class LoginWidget(QtGui.QDialog):
 
         self.editUserID = QtGui.QLineEdit()
         self.editPassword = QtGui.QLineEdit()
+        self.editPassword.setEchoMode(QtGui.QLineEdit.Password) 
 #         self.editMdAddress = QtGui.QLineEdit()
 #         self.editTdAddress = QtGui.QLineEdit()
         self.editBrokerID = QtGui.QLineEdit()
@@ -1243,10 +1244,43 @@ class TradingWidget(QtGui.QWidget):
     
     contractItem = OrderedDict()
     
-    contractItem['0'] = u'限价委托'
-    contractItem['4'] = u'最优五档剩余撤销'
-    contractItem['6'] = u'最优五档剩余转限价'
-
+    contractItem['0'] = u'IF1509.CFE'
+    contractItem['1'] = u'IF1510.CFE'
+    contractItem['2'] = u'IF1512.CFE'
+    contractItem['3'] = u'IF1603.CFE'
+    contractItem['4'] = u'IF1509.CFE'
+    contractItem['5'] = u'10000031.SH'
+    contractItem['6'] = u'10000032.SH'
+    contractItem['7'] = u'10000033.SH'
+    contractItem['8'] = u'10000034.SH'
+    contractItem['9'] = u'10000035.SH'
+    contractItem['10'] = u'10000047.SH'
+    contractItem['11'] = u'10000055.SH'
+    contractItem['12'] = u'10000063.SH'
+    contractItem['13'] = u'10000071.SH'
+    contractItem['14'] = u'10000079.SH'
+    contractItem['15'] = u'10000087.SH'
+    contractItem['16'] = u'10000095.SH'
+    contractItem['17'] = u'10000103.SH'
+    contractItem['18'] = u'10000125.SH'
+    contractItem['19'] = u'10000139.SH'
+    contractItem['20'] = u'10000140.SH'
+    contractItem['21'] = u'10000149.SH'
+    contractItem['22'] = u'10000157.SH'
+    contractItem['23'] = u'10000165.SH'
+    contractItem['24'] = u'10000173.SH'
+    contractItem['25'] = u'10000181.SH'
+    contractItem['26'] = u'10000197.SH'
+    contractItem['27'] = u'10000225.SH'
+    contractItem['28'] = u'10000339.SH'
+    contractItem['29'] = u'10000357.SH'
+    contractItem['30'] = u'10000358.SH'
+    contractItem['31'] = u'10000359.SH'
+    contractItem['32'] = u'10000360.SH'
+    contractItem['33'] = u'10000387.SH'
+    contractItem['34'] = u'10000388.SH'
+    contractItem['35'] = u'10000389.SH'
+    
     # 反转字典
     dictDirectionReverse = {value:key for key,value in dictDirection.items()}
     dictOffsetReverse = {value:key for key, value in dictOffset.items()}
@@ -1272,7 +1306,7 @@ class TradingWidget(QtGui.QWidget):
 
         # 左边部分
         labelID = QtGui.QLabel(u'代码')
-        labelName =  QtGui.QLabel(u'名称')
+#         labelName =  QtGui.QLabel(u'名称')
         labelDirection = QtGui.QLabel(u'委托类型')
         labelOffset = QtGui.QLabel(u'开平')
         labelContract = QtGui.QLabel(u'合约')
@@ -1283,7 +1317,7 @@ class TradingWidget(QtGui.QWidget):
         labelOperation = QtGui.QLabel(u'操作')
 
         self.lineID = QtGui.QLineEdit()
-        self.lineName = QtGui.QLineEdit()
+#         self.lineName = QtGui.QLineEdit()
 
         self.comboDirection = QtGui.QComboBox()
         self.comboDirection.addItems(self.dictDirection.values())
@@ -1309,7 +1343,7 @@ class TradingWidget(QtGui.QWidget):
         self.comboPriceType.addItems(self.dictPriceType.values())
         
         self.lineID1 = QtGui.QLineEdit()
-        self.lineName1 = QtGui.QLineEdit()
+#         self.lineName1 = QtGui.QLineEdit()
 
         self.comboDirection1 = QtGui.QComboBox()
         self.comboDirection1.addItems(self.dictDirection.values())
@@ -1336,7 +1370,7 @@ class TradingWidget(QtGui.QWidget):
 
         gridleft = QtGui.QGridLayout()
         gridleft.addWidget(labelID, 0, 0)
-        gridleft.addWidget(labelName, 1, 0)
+#         gridleft.addWidget(labelName, 1, 0)
         gridleft.addWidget(labelDirection, 2, 0)
         gridleft.addWidget(labelOffset, 3, 0)
         gridleft.addWidget(labelContract, 4, 0)
@@ -1345,7 +1379,7 @@ class TradingWidget(QtGui.QWidget):
         gridleft.addWidget(labelPriceMargin, 7, 0)
         gridleft.addWidget(labelPriceType, 8, 0)
         gridleft.addWidget(self.lineID, 0, 1)
-        gridleft.addWidget(self.lineName, 1, 1)
+#         gridleft.addWidget(self.lineName, 1, 1)
         gridleft.addWidget(self.comboDirection, 2, 1)
         gridleft.addWidget(self.comboOffset, 3, 1)
         gridleft.addWidget(self.contract, 4, 1)
@@ -1354,7 +1388,7 @@ class TradingWidget(QtGui.QWidget):
         gridleft.addWidget(self.priceMargin, 7, 1)
         gridleft.addWidget(self.comboPriceType, 8, 1)	
         gridleft.addWidget(self.lineID1, 0, 2)
-        gridleft.addWidget(self.lineName1, 1, 2)
+#         gridleft.addWidget(self.lineName1, 1, 2)
         gridleft.addWidget(self.comboDirection1, 2, 2)
         gridleft.addWidget(self.comboOffset1, 3, 2)
         gridleft.addWidget(self.contract1, 4, 2)
@@ -1461,12 +1495,14 @@ class TradingWidget(QtGui.QWidget):
         # 关联更新
         buttonSendOrder.clicked.connect(self.sendOrder)
         buttonCancelAll.clicked.connect(self.__orderMonitor.cancelAll)
-        self.lineID.returnPressed.connect(self.updateID)
+#         self.lineID.returnPressed.connect(self.updateID)
+#         self.contract.connect(self.updateID) 
 
     #----------------------------------------------------------------------
     def updateID(self):
         """合约变化"""
-        instrumentid = str(self.lineID.text())
+#         instrumentid = str(self.lineID.text())
+        instrumentid = str(self.contract.currentText())
         # 获取合约
         instrument = self.__mainEngine.wa.subscribe(instrumentid, "rt_bid1,rt_bsize1,rt_ask1,rt_asize1,rt_latest,rt_vol,rt_time,rt_pre_close")
         if instrument.ErrorCode==0:
