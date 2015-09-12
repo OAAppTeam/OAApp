@@ -132,25 +132,28 @@ class AccountMonitor(QtGui.QTableWidget):
         data = event.dict_['data']
         fields = data.Fields
         datas = data.Data
-        accountid = datas[fields.index('AssetAccount')][0]
+        
+        if 'FrozenFare' in fields:
+        
+            accountid = datas[fields.index('AssetAccount')][0]
 
-        # 如果之前已经收到过这个账户的数据, 则直接更新
-        if accountid in self.dictAccount:
-            d = self.dictAccount[accountid]
+            # 如果之前已经收到过这个账户的数据, 则直接更新
+            if accountid in self.dictAccount:
+                d = self.dictAccount[accountid]
 
-            for label, cell in d.items():
-                cell.setText(str(datas[fields.index(label)][0]))
-        # 否则插入新的一行，并更新
-        else:
-            self.insertRow(0)
-            d = {}
+                for label, cell in d.items():
+                    cell.setText(str(datas[fields.index(label)][0]))
+                    # 否则插入新的一行，并更新
+            else:
+                self.insertRow(0)
+                d = {}
 
-            for col, label in enumerate(self.dictLabels.keys()):
-                cell = QtGui.QTableWidgetItem(str(datas[fields.index(label)][0]))
-                self.setItem(0, col, cell)
-                d[label] = cell
+                for col, label in enumerate(self.dictLabels.keys()):
+                    cell = QtGui.QTableWidgetItem(str(datas[fields.index(label)][0]))
+                    self.setItem(0, col, cell)
+                    d[label] = cell
 
-            self.dictAccount[accountid] = d
+                    self.dictAccount[accountid] = d
 
 
 ########################################################################
@@ -253,13 +256,13 @@ class TradeMonitor(QtGui.QTableWidget):
                 d = self.dictTrade[onum]
                 for label, cell in d.items():
                     value=''
-                    if label == 'InstrumentID':
+                    if label == 'InstrumentID'and 'SecurityCode' in field:
                         try:
                             k = field.index('SecurityCode')
                             value = data[k][i]
                         except KeyError:
                             value = u'未知类型'
-                    elif label == 'ExchangeInstID':
+                    elif label == 'ExchangeInstID'and 'SecurityName' in field:
                         try:
                             k = field.index('SecurityName')
                             value = data[k][i]
@@ -270,7 +273,7 @@ class TradeMonitor(QtGui.QTableWidget):
                             value = ''
                         except KeyError:
                             value = u'未知类型'
-                    elif label == 'Direction':
+                    elif label == 'Direction'and 'TradeSide' in field:
                         try:
                             k = field.index('TradeSide')
                             value = data[k][i]
@@ -290,7 +293,7 @@ class TradeMonitor(QtGui.QTableWidget):
                                 value = ''
                         except KeyError:
                             value = u'未知类型'
-                    elif label == 'OffsetFlag':
+                    elif label == 'OffsetFlag'and 'TradeSide' in field:
                         try:
                             k = field.index('TradeSide')
                             value = data[k][i]
@@ -310,32 +313,32 @@ class TradeMonitor(QtGui.QTableWidget):
                                 value = ''
                         except KeyError:
                             value = u'未知类型'
-                    elif label == 'TradeID':
+                    elif label == 'TradeID'and 'TradedNumber' in field:
                         try:
                             k = field.index('TradedNumber')
                             value = data[k][i]
                         except KeyError:
                             value = u'未知类型'        
-                    elif label == 'TradeTime':
+                    elif label == 'TradeTime'and 'TradedTime' in field:
                         try:
                             k = field.index('TradedTime')
                             value = str(data[k][i])
                         except KeyError:
                             value = u'未知类型'
-                    elif label == 'Volume':
+                    elif label == 'Volume'and 'TradedVolume' in field:
                         try:
                             k = field.index('TradedVolume')
                             value = data[k][i]
 
                         except KeyError:
                             value = u'未知类型'
-                    elif label == 'Price':
+                    elif label == 'Price'and 'TradedPrice' in field:
                         try:
                             k = field.index('TradedPrice')
                             value = data[k][i]
                         except KeyError:
                             value = u'未知类型'        
-                    elif label == 'OrderRef':
+                    elif label == 'OrderRef'and 'OrderNumber' in field:
                         try:
                             k = field.index('OrderNumber')
                             value = data[k][i]
@@ -353,13 +356,13 @@ class TradeMonitor(QtGui.QTableWidget):
                 d={}
                 for col, label in enumerate(self.dictLabels.keys()):
                     value=''
-                    if label == 'InstrumentID':
+                    if label == 'InstrumentID'and 'SecurityCode' in field:
                         try:
                             k = field.index('SecurityCode')
                             value = data[k][i]
                         except KeyError:
                             value = u'未知类型'
-                    elif label == 'ExchangeInstID':
+                    elif label == 'ExchangeInstID' and 'SecurityName' in field:
                         try:
                             
                             k = field.index('SecurityName')
@@ -367,12 +370,12 @@ class TradeMonitor(QtGui.QTableWidget):
                             
                         except KeyError:
                             value = u'未知类型'
-                    elif label == 'ExchangeID':
+                    elif label == 'ExchangeID'and 'SecurityName' in field:
                         try:
                             value = ''
                         except KeyError:
                             value = u'未知类型'
-                    elif label == 'Direction':
+                    elif label == 'Direction'and 'TradeSide' in field:
                         try:
                             
                             k = field.index('TradeSide')
@@ -393,7 +396,7 @@ class TradeMonitor(QtGui.QTableWidget):
                                 value = ''
                         except KeyError:
                             value = u'未知类型'
-                    elif label == 'OffsetFlag':
+                    elif label == 'OffsetFlag'and 'TradeSide' in field:
                         try:
                             
                             k = field.index('TradeSide')
@@ -414,26 +417,26 @@ class TradeMonitor(QtGui.QTableWidget):
                                 value = ''
                         except KeyError:
                             value = u'未知类型'
-                    elif label == 'TradeID':
+                    elif label == 'TradeID'and 'TradedNumber' in field:
                         try:                           
                             k = field.index('TradedNumber')
                             value = data[k][i]
                         except KeyError:
                             value = u'未知类型'        
-                    elif label == 'TradeTime':
+                    elif label == 'TradeTime'and 'TradedTime' in field:
                         try:
                             k = field.index('TradedTime')
                             value = str(data[k][i])
                                 
                         except KeyError:
                             value = u'未知类型'
-                    elif label == 'Volume':
+                    elif label == 'Volume'and 'TradedVolume' in field:
                         try:
                             k = field.index('TradedVolume')
                             value = str(data[k][i])
                         except KeyError:
                             value = u'未知类型'
-                    elif label == 'Price':
+                    elif label == 'Price'and 'TradedPrice' in field:
                         try:
                             
                             k = field.index('TradedPrice')
@@ -441,7 +444,7 @@ class TradeMonitor(QtGui.QTableWidget):
                             
                         except KeyError:
                             value = u'未知类型'        
-                    elif label == 'OrderRef':
+                    elif label == 'OrderRef'and 'OrderNumber' in field:
                         try:
                             k = field.index('OrderNumber')
                             value = data[k][i]
@@ -513,7 +516,7 @@ class PositionMonitor(QtGui.QTableWidget):
         fields = data.Fields
         datas = data.Data
         # 过滤返回值为空的情况
-        if datas[fields.index('SecurityName')][0]:
+        if 'SecurityName' in fields:
             posid = datas[fields.index('SecurityName')][0] + '.' + datas[fields.index('TradeSide')][0]
 
             # 如果之前已经收到过这个账户的数据, 则直接更新
