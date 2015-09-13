@@ -63,11 +63,8 @@ class WindApi:
         if indata.ErrorCode == 0:
             
             event = Event(type_=EVENT_LOG)
-            
             log = u'合约查询成功'
-            
             event.dict_['log'] = log
-            
             self.__eventEngine.put(event)
             event = Event(type_=EVENT_MARKETDATA)
             event.dict_['data'] = indata.Data

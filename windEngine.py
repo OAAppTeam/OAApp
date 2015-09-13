@@ -11,6 +11,11 @@ class MainEngine:
         self.wa = WindApi(self.ee)
         self.wa.start()
         self.ee.start()
+        if not self.wa.isConnected():
+            event = Event(type_=EVENT_LOG)
+            log = u'未连接服务器，请重启'
+            event.dict_['log'] = log
+            self.ee.put(event)
 
         # 循环查询持仓和账户相关
         self.countGet = 0               # 查询延时计数

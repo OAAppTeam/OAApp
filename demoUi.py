@@ -132,6 +132,7 @@ class AccountMonitor(QtGui.QTableWidget):
         data = event.dict_['data']
         fields = data.Fields
         datas = data.Data
+        
         accountid = datas[fields.index('AssetAccount')][0]
 
         # 如果之前已经收到过这个账户的数据, 则直接更新
@@ -139,16 +140,18 @@ class AccountMonitor(QtGui.QTableWidget):
             d = self.dictAccount[accountid]
 
             for label, cell in d.items():
-                cell.setText(str(datas[fields.index(label)][0]))
+                if label in fields:
+                    cell.setText(unicode(datas[fields.index(label)][0]))
         # 否则插入新的一行，并更新
         else:
             self.insertRow(0)
             d = {}
 
             for col, label in enumerate(self.dictLabels.keys()):
-                cell = QtGui.QTableWidgetItem(str(datas[fields.index(label)][0]))
-                self.setItem(0, col, cell)
-                d[label] = cell
+                if label in fields:
+                    cell = QtGui.QTableWidgetItem(unicode(datas[fields.index(label)][0]))
+                    self.setItem(0, col, cell)
+                    d[label] = cell
 
             self.dictAccount[accountid] = d
 
@@ -262,13 +265,13 @@ class TradeMonitor(QtGui.QTableWidget):
                 d = self.dictTrade[onum]
                 for label, cell in d.items():
                     value=''
-                    if label == 'InstrumentID':
+                    if label == 'InstrumentID'and 'SecurityCode' in field:
                         try:
                             k = field.index('SecurityCode')
                             value = data[k][i]
                         except KeyError:
                             value = u'未知类型'
-                    elif label == 'ExchangeInstID':
+                    elif label == 'ExchangeInstID'and 'SecurityName' in field:
                         try:
                             k = field.index('SecurityName')
                             value = data[k][i]
@@ -279,7 +282,7 @@ class TradeMonitor(QtGui.QTableWidget):
                             value = ''
                         except KeyError:
                             value = u'未知类型'
-                    elif label == 'Direction':
+                    elif label == 'Direction'and 'TradeSide' in field:
                         try:
                             k = field.index('TradeSide')
                             value = data[k][i]
@@ -299,7 +302,7 @@ class TradeMonitor(QtGui.QTableWidget):
                                 value = ''
                         except KeyError:
                             value = u'未知类型'
-                    elif label == 'OffsetFlag':
+                    elif label == 'OffsetFlag'and 'TradeSide' in field:
                         try:
                             k = field.index('TradeSide')
                             value = data[k][i]
@@ -319,32 +322,32 @@ class TradeMonitor(QtGui.QTableWidget):
                                 value = ''
                         except KeyError:
                             value = u'未知类型'
-                    elif label == 'TradeID':
+                    elif label == 'TradeID'and 'TradedNumber' in field:
                         try:
                             k = field.index('TradedNumber')
                             value = data[k][i]
                         except KeyError:
                             value = u'未知类型'        
-                    elif label == 'TradeTime':
+                    elif label == 'TradeTime'and 'TradedTime' in field:
                         try:
                             k = field.index('TradedTime')
                             value = str(data[k][i])
                         except KeyError:
                             value = u'未知类型'
-                    elif label == 'Volume':
+                    elif label == 'Volume'and 'TradedVolume' in field:
                         try:
                             k = field.index('TradedVolume')
                             value = data[k][i]
 
                         except KeyError:
                             value = u'未知类型'
-                    elif label == 'Price':
+                    elif label == 'Price'and 'TradedPrice' in field:
                         try:
                             k = field.index('TradedPrice')
                             value = data[k][i]
                         except KeyError:
                             value = u'未知类型'        
-                    elif label == 'OrderRef':
+                    elif label == 'OrderRef'and 'OrderNumber' in field:
                         try:
                             k = field.index('OrderNumber')
                             value = data[k][i]
@@ -362,13 +365,13 @@ class TradeMonitor(QtGui.QTableWidget):
                 d={}
                 for col, label in enumerate(self.dictLabels.keys()):
                     value=''
-                    if label == 'InstrumentID':
+                    if label == 'InstrumentID'and 'SecurityCode' in field:
                         try:
                             k = field.index('SecurityCode')
                             value = data[k][i]
                         except KeyError:
                             value = u'未知类型'
-                    elif label == 'ExchangeInstID':
+                    elif label == 'ExchangeInstID' and 'SecurityName' in field:
                         try:
                             
                             k = field.index('SecurityName')
@@ -376,12 +379,12 @@ class TradeMonitor(QtGui.QTableWidget):
                             
                         except KeyError:
                             value = u'未知类型'
-                    elif label == 'ExchangeID':
+                    elif label == 'ExchangeID'and 'SecurityName' in field:
                         try:
                             value = ''
                         except KeyError:
                             value = u'未知类型'
-                    elif label == 'Direction':
+                    elif label == 'Direction'and 'TradeSide' in field:
                         try:
                             
                             k = field.index('TradeSide')
@@ -402,7 +405,7 @@ class TradeMonitor(QtGui.QTableWidget):
                                 value = ''
                         except KeyError:
                             value = u'未知类型'
-                    elif label == 'OffsetFlag':
+                    elif label == 'OffsetFlag'and 'TradeSide' in field:
                         try:
                             
                             k = field.index('TradeSide')
@@ -423,26 +426,26 @@ class TradeMonitor(QtGui.QTableWidget):
                                 value = ''
                         except KeyError:
                             value = u'未知类型'
-                    elif label == 'TradeID':
+                    elif label == 'TradeID'and 'TradedNumber' in field:
                         try:                           
                             k = field.index('TradedNumber')
                             value = data[k][i]
                         except KeyError:
                             value = u'未知类型'        
-                    elif label == 'TradeTime':
+                    elif label == 'TradeTime'and 'TradedTime' in field:
                         try:
                             k = field.index('TradedTime')
                             value = str(data[k][i])
                                 
                         except KeyError:
                             value = u'未知类型'
-                    elif label == 'Volume':
+                    elif label == 'Volume'and 'TradedVolume' in field:
                         try:
                             k = field.index('TradedVolume')
                             value = str(data[k][i])
                         except KeyError:
                             value = u'未知类型'
-                    elif label == 'Price':
+                    elif label == 'Price'and 'TradedPrice' in field:
                         try:
                             
                             k = field.index('TradedPrice')
@@ -450,7 +453,7 @@ class TradeMonitor(QtGui.QTableWidget):
                             
                         except KeyError:
                             value = u'未知类型'        
-                    elif label == 'OrderRef':
+                    elif label == 'OrderRef'and 'OrderNumber' in field:
                         try:
                             k = field.index('OrderNumber')
                             value = data[k][i]
@@ -522,27 +525,28 @@ class PositionMonitor(QtGui.QTableWidget):
         fields = data.Fields
         datas = data.Data
         # 过滤返回值为空的情况
-        if datas[fields.index('SecurityName')][0]:
-            posid = datas[fields.index('SecurityName')][0] + '.' + datas[fields.index('TradeSide')][0]
+        posid = datas[fields.index('SecurityName')][0] + '.' + datas[fields.index('TradeSide')][0]
 
-            # 如果之前已经收到过这个账户的数据, 则直接更新
-            if posid in self.dictPosition:
-                d = self.dictPosition[posid]
+        # 如果之前已经收到过这个账户的数据, 则直接更新
+        if posid in self.dictPosition:
+            d = self.dictPosition[posid]
 
-                for label, cell in d.items():
-                    value = str(datas[fields.index(label)][0])
+            for label, cell in d.items():
+                if label in fields:
+                    value = unicode(datas[fields.index(label)][0])
                     cell.setText(value)
-            # 否则插入新的一行，并更新
-            else:
-                self.insertRow(0)
-                d = {}
+        # 否则插入新的一行，并更新
+        else:
+            self.insertRow(0)
+            d = {}
 
-                for col, label in enumerate(self.dictLabels.keys()):
+            for col, label in enumerate(self.dictLabels.keys()):
+                if label in fields:
                     cell = QtGui.QTableWidgetItem(datas[fields.index(label)][0])
                     self.setItem(0, col, cell)
                     d[label] = cell
 
-                self.dictPosition[posid] = d
+            self.dictPosition[posid] = d
 
 
 ########################################################################
@@ -869,7 +873,7 @@ class MarketDataMonitor(QtGui.QTableWidget):
     signal = QtCore.pyqtSignal(type(Event()))
 
     dictLabels = OrderedDict()
-    dictLabels['Name'] = u'合约名称'
+#     dictLabels['Name'] = u'合约名称'
     dictLabels['InstrumentID'] = u'合约代码'
     dictLabels['ExchangeInstID'] = u'合约交易所代码'
 
@@ -930,8 +934,8 @@ class MarketDataMonitor(QtGui.QTableWidget):
                     
                     value = str(instrumentid)                    
                     
-                elif label=='Name':
-                    value = ''                
+#                 elif label=='Name':
+#                     value = ''                
                     
                                 
                     
@@ -984,11 +988,11 @@ class MarketDataMonitor(QtGui.QTableWidget):
                     cell = QtGui.QTableWidgetItem(value)
                     self.setItem(row, col, cell)
                     d[label] = cell
-                elif label=='Name':
-                    name = ''			    
-                    cell = QtGui.QTableWidgetItem(name)	
-                    self.setItem(row, col, cell)
-                    d[label] = cell
+#                 elif label=='Name':
+#                     name = ''			    
+#                     cell = QtGui.QTableWidgetItem(name)	
+#                     self.setItem(row, col, cell)
+#                     d[label] = cell
                 
                 elif label=='BidPrice1':
                     for k in range(0,len(field)):
@@ -1054,7 +1058,18 @@ class MarketDataMonitor(QtGui.QTableWidget):
 ########################################################################
 class LoginWidget(QtGui.QDialog):
     """登录"""
-
+    accountType = OrderedDict()
+    
+    accountType['SHSZ'] = u'沪深A股'
+    accountType['SZB'] = u'深市B股'
+    accountType['SHB'] = u'沪市B股'
+    accountType['CFE'] = u'中金所期货'
+    accountType['SHF'] = u'上期所期货'
+    accountType['DCE'] = u'大商所期货'
+    accountType['CZE'] = u'郑商所期货'
+    accountType['SHO'] = u'上交所期权'
+    
+    accountTypeReverse = {value:key for key,value in accountType.items()}
     #----------------------------------------------------------------------
     def __init__(self, mainEngine, parent=None):
         """Constructor"""
@@ -1080,12 +1095,13 @@ class LoginWidget(QtGui.QDialog):
 
         self.editUserID = QtGui.QLineEdit()
         self.editPassword = QtGui.QLineEdit()
+        self.editPassword.setEchoMode(QtGui.QLineEdit.Password) 
 #         self.editMdAddress = QtGui.QLineEdit()
 #         self.editTdAddress = QtGui.QLineEdit()
         self.editBrokerID = QtGui.QLineEdit()
         self.editDepartmentID = QtGui.QLineEdit()
-        self.editAccountType = QtGui.QLineEdit()
-
+        self.editAccountType = QtGui.QComboBox()
+        self.editAccountType.addItems(self.accountType.values())
         self.editUserID.setMinimumWidth(200)
 
         buttonLogin = QtGui.QPushButton(u'登录')
@@ -1126,7 +1142,7 @@ class LoginWidget(QtGui.QDialog):
 #         tdAddress = str(self.editTdAddress.text())
         brokerid = str(self.editBrokerID.text())
         departmentid = str(self.editDepartmentID.text())
-        accountType = str(self.editAccountType.text())
+        accountType = self.accountTypeReverse[unicode(self.editAccountType.currentText())]
         print userid,password,brokerid,accountType
         #self.__mainEngine.wa.tLogon('00000010', '0' , "M:1585078833901", '111111','SHSZ')
         self.__mainEngine.wa.tLogon(brokerid, departmentid , userid, password,accountType)
@@ -1156,7 +1172,7 @@ class LoginWidget(QtGui.QDialog):
 #             self.editTdAddress.setText(tdAddress)
             self.editBrokerID.setText(brokerid)
             self.editDepartmentID.setText(departmentid)
-            self.editAccountType.setText(accountType)
+#             self.editAccountType.setText(accountType)
         except KeyError:
             pass
 
@@ -1172,7 +1188,7 @@ class LoginWidget(QtGui.QDialog):
 #         setting['tdAddress'] = str(self.editTdAddress.text())
         setting['brokerid'] = str(self.editBrokerID.text())
         setting['departmentid'] = str(self.editDepartmentID.text())
-        setting['accountType'] = str(self.editAccountType.text())
+        setting['accountType'] = self.accountTypeReverse[unicode(self.editAccountType.currentText())]
         f = shelve.open('setting.vn')
         f['login'] = setting
         f.close()	
@@ -1183,7 +1199,7 @@ class LoginWidget(QtGui.QDialog):
         # 当窗口被关闭时，先保存登录数据，再关闭
         self.saveData()
         event.accept()  	
-
+ 
 
 ########################################################################
 class ControlWidget(QtGui.QWidget):
@@ -1238,12 +1254,47 @@ class TradingWidget(QtGui.QWidget):
     dictPriceType['4'] = u'最优五档剩余撤销'
     dictPriceType['6'] = u'最优五档剩余转限价'
     
+
+    
     contractItem = OrderedDict()
     
-    contractItem['0'] = u'限价委托'
-    contractItem['4'] = u'最优五档剩余撤销'
-    contractItem['6'] = u'最优五档剩余转限价'
-
+    contractItem['0'] = u'IF1509.CFE'
+    contractItem['1'] = u'IF1510.CFE'
+    contractItem['2'] = u'IF1512.CFE'
+    contractItem['3'] = u'IF1603.CFE'
+    contractItem['4'] = u'IF1509.CFE'
+    contractItem['5'] = u'10000031.SH'
+    contractItem['6'] = u'10000032.SH'
+    contractItem['7'] = u'10000033.SH'
+    contractItem['8'] = u'10000034.SH'
+    contractItem['9'] = u'10000035.SH'
+    contractItem['10'] = u'10000047.SH'
+    contractItem['11'] = u'10000055.SH'
+    contractItem['12'] = u'10000063.SH'
+    contractItem['13'] = u'10000071.SH'
+    contractItem['14'] = u'10000079.SH'
+    contractItem['15'] = u'10000087.SH'
+    contractItem['16'] = u'10000095.SH'
+    contractItem['17'] = u'10000103.SH'
+    contractItem['18'] = u'10000125.SH'
+    contractItem['19'] = u'10000139.SH'
+    contractItem['20'] = u'10000140.SH'
+    contractItem['21'] = u'10000149.SH'
+    contractItem['22'] = u'10000157.SH'
+    contractItem['23'] = u'10000165.SH'
+    contractItem['24'] = u'10000173.SH'
+    contractItem['25'] = u'10000181.SH'
+    contractItem['26'] = u'10000197.SH'
+    contractItem['27'] = u'10000225.SH'
+    contractItem['28'] = u'10000339.SH'
+    contractItem['29'] = u'10000357.SH'
+    contractItem['30'] = u'10000358.SH'
+    contractItem['31'] = u'10000359.SH'
+    contractItem['32'] = u'10000360.SH'
+    contractItem['33'] = u'10000387.SH'
+    contractItem['34'] = u'10000388.SH'
+    contractItem['35'] = u'10000389.SH'
+    
     # 反转字典
     dictDirectionReverse = {value:key for key,value in dictDirection.items()}
     dictOffsetReverse = {value:key for key, value in dictOffset.items()}
@@ -1269,7 +1320,7 @@ class TradingWidget(QtGui.QWidget):
 
         # 左边部分
         labelID = QtGui.QLabel(u'代码')
-        labelName =  QtGui.QLabel(u'名称')
+#         labelName =  QtGui.QLabel(u'名称')
         labelDirection = QtGui.QLabel(u'委托类型')
         labelOffset = QtGui.QLabel(u'开平')
         labelContract = QtGui.QLabel(u'合约')
@@ -1280,7 +1331,7 @@ class TradingWidget(QtGui.QWidget):
         labelOperation = QtGui.QLabel(u'操作')
 
         self.lineID = QtGui.QLineEdit()
-        self.lineName = QtGui.QLineEdit()
+#         self.lineName = QtGui.QLineEdit()
 
         self.comboDirection = QtGui.QComboBox()
         self.comboDirection.addItems(self.dictDirection.values())
@@ -1306,7 +1357,7 @@ class TradingWidget(QtGui.QWidget):
         self.comboPriceType.addItems(self.dictPriceType.values())
         
         self.lineID1 = QtGui.QLineEdit()
-        self.lineName1 = QtGui.QLineEdit()
+#         self.lineName1 = QtGui.QLineEdit()
 
         self.comboDirection1 = QtGui.QComboBox()
         self.comboDirection1.addItems(self.dictDirection.values())
@@ -1333,7 +1384,7 @@ class TradingWidget(QtGui.QWidget):
 
         gridleft = QtGui.QGridLayout()
         gridleft.addWidget(labelID, 0, 0)
-        gridleft.addWidget(labelName, 1, 0)
+#         gridleft.addWidget(labelName, 1, 0)
         gridleft.addWidget(labelDirection, 2, 0)
         gridleft.addWidget(labelOffset, 3, 0)
         gridleft.addWidget(labelContract, 4, 0)
@@ -1342,7 +1393,7 @@ class TradingWidget(QtGui.QWidget):
         gridleft.addWidget(labelPriceMargin, 7, 0)
         gridleft.addWidget(labelPriceType, 8, 0)
         gridleft.addWidget(self.lineID, 0, 1)
-        gridleft.addWidget(self.lineName, 1, 1)
+#         gridleft.addWidget(self.lineName, 1, 1)
         gridleft.addWidget(self.comboDirection, 2, 1)
         gridleft.addWidget(self.comboOffset, 3, 1)
         gridleft.addWidget(self.contract, 4, 1)
@@ -1351,7 +1402,7 @@ class TradingWidget(QtGui.QWidget):
         gridleft.addWidget(self.priceMargin, 7, 1)
         gridleft.addWidget(self.comboPriceType, 8, 1)	
         gridleft.addWidget(self.lineID1, 0, 2)
-        gridleft.addWidget(self.lineName1, 1, 2)
+#         gridleft.addWidget(self.lineName1, 1, 2)
         gridleft.addWidget(self.comboDirection1, 2, 2)
         gridleft.addWidget(self.comboOffset1, 3, 2)
         gridleft.addWidget(self.contract1, 4, 2)
@@ -1442,6 +1493,7 @@ class TradingWidget(QtGui.QWidget):
         # 发单按钮
         buttonSendOrder = QtGui.QPushButton(u'发单')
         buttonCancelAll = QtGui.QPushButton(u'全撤')
+        auto = QtGui.QPushButton(u'自动套利')
 
         # 整合布局
         hbox = QtGui.QHBoxLayout()
@@ -1452,6 +1504,7 @@ class TradingWidget(QtGui.QWidget):
         vbox.addLayout(hbox)
         vbox.addWidget(buttonSendOrder)
         vbox.addWidget(buttonCancelAll)
+        vbox.addWidget(auto)
 
         self.setLayout(vbox)
 
@@ -1459,11 +1512,13 @@ class TradingWidget(QtGui.QWidget):
         buttonSendOrder.clicked.connect(self.sendOrder)
         buttonCancelAll.clicked.connect(self.__orderMonitor.cancelAll)
         self.lineID.returnPressed.connect(self.updateID)
+#         self.contract.connect(self.updateID) 
 
     #----------------------------------------------------------------------
     def updateID(self):
         """合约变化"""
-        instrumentid = str(self.lineID.text())
+#         instrumentid = str(self.lineID.text())
+        instrumentid = str(self.contract.currentText())
         # 获取合约
         instrument = self.__mainEngine.wa.subscribe(instrumentid, "rt_bid1,rt_bsize1,rt_ask1,rt_asize1,rt_latest,rt_vol,rt_time,rt_pre_close")
         if instrument.ErrorCode==0:
