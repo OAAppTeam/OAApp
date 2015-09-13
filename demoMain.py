@@ -1,8 +1,7 @@
 # encoding: UTF-8
 
 """
-璇ユ枃浠朵腑鍖呭惈鐨勬槸浜ゆ槗骞冲彴鐨勪富鍑芥暟锛�
-灏嗗簳灞傘�佷腑灞傘�佷笂灞傜殑鍔熻兘瀵煎叆锛屽苟杩愯銆�
+程序入口，整合上层界面，中层引擎与底层接口
 """
 
 import ctypes
@@ -13,8 +12,7 @@ from demoUi import *
 
 #----------------------------------------------------------------------
 def main():
-    """涓荤▼搴忓叆鍙�"""
-    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('vn.py demo')  # win7浠ヤ笅璇锋敞閲婃帀璇ヨ   
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('vn.py demo')
     
     app = QtGui.QApplication(sys.argv)
     app.setWindowIcon(QtGui.QIcon('vnpy.ico'))
