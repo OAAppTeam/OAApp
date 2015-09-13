@@ -58,55 +58,15 @@ class MainEngine:
     #----------------------------------------------------------------------
     def initGet(self, event):
         """在交易服务器登录成功后，开始初始化查询"""
-        # 打开设定文件setting.vn
-        f = shelve.open('setting.vn')
+        # 如果本地保存的合约数据是今日的，则载入，否则发出查询请求
 
-        # 尝试读取设定字典，若该字典不存在，则发出查询请求
-        try:
-            d = f['instrument']
+        # 开始循环查询
+        self.ee.register(EVENT_TIMER, self.getAccountPosition)
 
-            # 如果本地保存的合约数据是今日的，则载入，否则发出查询请求
-            today = date.today()
-            if d['date'] != today:
-                self.dictInstrument = d['dictInstrument']
-
-                event = Event(type_=EVENT_LOG)
-                log = u'合约信息读取完成'
-                event.dict_['log'] = log
-                self.ee.put(event)
-
-                # self.getInvestor()
-
-                # 开始循环查询
-                self.ee.register(EVENT_TIMER, self.getAccountPosition)
-            else:
-                self.getInstrument()
-        except KeyError:
-            self.getInstrument()
-
-        f.close()
-
-    def insertInstrument(self, event):
-        """插入合约对象"""
-        data = event.dict_['data']
-        last = event.dict_['last']
-
-        self.dictInstrument[data['InstrumentID']] = data
-
-        # 合约对象查询完成后，查询投资者信息并开始循环查询
-        if last:
-            # 将查询完成的合约信息保存到本地文件，今日登录可直接使用不再查询
-            self.saveInstrument()
-
-            event = Event(type_=EVENT_LOG)
-            log = u'合约信息查 询完成'
-            event.dict_['log'] = log
-            self.ee.put(event)
-
-            # self.getInvestor()
-
-            # 开始循环查询
-            self.ee.register(EVENT_TIMER, self.getAccountPosition)
+        event = Event(type_=EVENT_LOG)
+        log = u'合约信息查询'
+        event.dict_['log'] = log
+        self.ee.put(event)
         
     def exit(self):
         """退出"""

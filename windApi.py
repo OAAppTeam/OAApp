@@ -19,7 +19,11 @@ class WindApi:
 
     # 判断是否连接
     def isConnected(self):
-        return w.isconnected()
+        if not w.isconnected():
+            event = Event(type_=EVENT_LOG)
+            log = u'未连接服务器，请重启'
+            event.dict_['log'] = log
+            self.ee.put(event)
 
     # 取消订阅
     def cancelSubscribe(self, id):
@@ -63,11 +67,8 @@ class WindApi:
         if indata.ErrorCode == 0:
             
             event = Event(type_=EVENT_LOG)
-            
             log = u'合约查询成功'
-            
             event.dict_['log'] = log
-            
             self.__eventEngine.put(event)
             event = Event(type_=EVENT_MARKETDATA)
             event.dict_['data'] = indata.Data
@@ -105,6 +106,7 @@ class WindApi:
         LogonID = w.tlogon(brokerId, departmentId, accountId, password, accountType)
         print LogonID
         if LogonID.ErrorCode != 0:
+            self.isConnected()
             event = Event(type_=EVENT_LOG)
             log = u'登陆错误，'
             event.dict_['log'] = log

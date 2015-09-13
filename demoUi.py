@@ -133,27 +133,27 @@ class AccountMonitor(QtGui.QTableWidget):
         fields = data.Fields
         datas = data.Data
         
-        if 'FrozenFare' in fields:
-        
-            accountid = datas[fields.index('AssetAccount')][0]
+        accountid = datas[fields.index('AssetAccount')][0]
 
-            # 如果之前已经收到过这个账户的数据, 则直接更新
-            if accountid in self.dictAccount:
-                d = self.dictAccount[accountid]
+        # 如果之前已经收到过这个账户的数据, 则直接更新
+        if accountid in self.dictAccount:
+            d = self.dictAccount[accountid]
 
-                for label, cell in d.items():
-                    cell.setText(str(datas[fields.index(label)][0]))
-                    # 否则插入新的一行，并更新
-            else:
-                self.insertRow(0)
-                d = {}
+            for label, cell in d.items():
+                if label in fields:
+                    cell.setText(unicode(datas[fields.index(label)][0]))
+        # 否则插入新的一行，并更新
+        else:
+            self.insertRow(0)
+            d = {}
 
-                for col, label in enumerate(self.dictLabels.keys()):
-                    cell = QtGui.QTableWidgetItem(str(datas[fields.index(label)][0]))
+            for col, label in enumerate(self.dictLabels.keys()):
+                if label in fields:
+                    cell = QtGui.QTableWidgetItem(unicode(datas[fields.index(label)][0]))
                     self.setItem(0, col, cell)
                     d[label] = cell
 
-                    self.dictAccount[accountid] = d
+            self.dictAccount[accountid] = d
 
 
 ########################################################################
@@ -525,27 +525,28 @@ class PositionMonitor(QtGui.QTableWidget):
         fields = data.Fields
         datas = data.Data
         # 过滤返回值为空的情况
-        if 'SecurityName' in fields:
-            posid = datas[fields.index('SecurityName')][0] + '.' + datas[fields.index('TradeSide')][0]
+        posid = datas[fields.index('SecurityName')][0] + '.' + datas[fields.index('TradeSide')][0]
 
-            # 如果之前已经收到过这个账户的数据, 则直接更新
-            if posid in self.dictPosition:
-                d = self.dictPosition[posid]
+        # 如果之前已经收到过这个账户的数据, 则直接更新
+        if posid in self.dictPosition:
+            d = self.dictPosition[posid]
 
-                for label, cell in d.items():
-                    value = str(datas[fields.index(label)][0])
+            for label, cell in d.items():
+                if label in fields:
+                    value = unicode(datas[fields.index(label)][0])
                     cell.setText(value)
-            # 否则插入新的一行，并更新
-            else:
-                self.insertRow(0)
-                d = {}
+        # 否则插入新的一行，并更新
+        else:
+            self.insertRow(0)
+            d = {}
 
-                for col, label in enumerate(self.dictLabels.keys()):
+            for col, label in enumerate(self.dictLabels.keys()):
+                if label in fields:
                     cell = QtGui.QTableWidgetItem(datas[fields.index(label)][0])
                     self.setItem(0, col, cell)
                     d[label] = cell
 
-                self.dictPosition[posid] = d
+            self.dictPosition[posid] = d
 
 
 ########################################################################
@@ -1058,13 +1059,14 @@ class LoginWidget(QtGui.QDialog):
     """登录"""
     accountType = OrderedDict()
     
-    accountType['0'] = u'上海深圳A'
-    accountType['1'] = u'深圳B'
-    accountType['2'] = u'上海B'
-    accountType['3'] = u'中金所'
-    accountType['4'] = u'上期所'
-    accountType['5'] = u'大商所'
-    accountType['6'] = u'郑商所'
+    accountType['SHSZ'] = u'沪深A股'
+    accountType['SZB'] = u'深市B股'
+    accountType['SHB'] = u'沪市B股'
+    accountType['CFE'] = u'中金所期货'
+    accountType['SHF'] = u'上期所期货'
+    accountType['DCE'] = u'大商所期货'
+    accountType['CZE'] = u'郑商所期货'
+    accountType['SHO'] = u'上交所期权'
     
     accountTypeReverse = {value:key for key,value in accountType.items()}
     #----------------------------------------------------------------------
