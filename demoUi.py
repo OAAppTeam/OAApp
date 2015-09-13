@@ -1057,7 +1057,17 @@ class MarketDataMonitor(QtGui.QTableWidget):
 ########################################################################
 class LoginWidget(QtGui.QDialog):
     """登录"""
-
+    accountType = OrderedDict()
+    
+    accountType['0'] = u'上海深圳A'
+    accountType['1'] = u'深圳B'
+    accountType['2'] = u'上海B'
+    accountType['3'] = u'中金所'
+    accountType['4'] = u'上期所'
+    accountType['5'] = u'大商所'
+    accountType['6'] = u'郑商所'
+    
+    accountTypeReverse = {value:key for key,value in accountType.items()}
     #----------------------------------------------------------------------
     def __init__(self, mainEngine, parent=None):
         """Constructor"""
@@ -1088,8 +1098,8 @@ class LoginWidget(QtGui.QDialog):
 #         self.editTdAddress = QtGui.QLineEdit()
         self.editBrokerID = QtGui.QLineEdit()
         self.editDepartmentID = QtGui.QLineEdit()
-        self.editAccountType = QtGui.QLineEdit()
-
+        self.editAccountType = QtGui.QComboBox()
+        self.editAccountType.addItems(self.accountType.values())
         self.editUserID.setMinimumWidth(200)
 
         buttonLogin = QtGui.QPushButton(u'登录')
@@ -1130,7 +1140,7 @@ class LoginWidget(QtGui.QDialog):
 #         tdAddress = str(self.editTdAddress.text())
         brokerid = str(self.editBrokerID.text())
         departmentid = str(self.editDepartmentID.text())
-        accountType = str(self.editAccountType.text())
+        accountType = self.accountTypeReverse[unicode(self.editAccountType.currentText())]
         print userid,password,brokerid,accountType
         #self.__mainEngine.wa.tLogon('00000010', '0' , "M:1585078833901", '111111','SHSZ')
         self.__mainEngine.wa.tLogon(brokerid, departmentid , userid, password,accountType)
@@ -1160,7 +1170,7 @@ class LoginWidget(QtGui.QDialog):
 #             self.editTdAddress.setText(tdAddress)
             self.editBrokerID.setText(brokerid)
             self.editDepartmentID.setText(departmentid)
-            self.editAccountType.setText(accountType)
+#             self.editAccountType.setText(accountType)
         except KeyError:
             pass
 
@@ -1176,7 +1186,7 @@ class LoginWidget(QtGui.QDialog):
 #         setting['tdAddress'] = str(self.editTdAddress.text())
         setting['brokerid'] = str(self.editBrokerID.text())
         setting['departmentid'] = str(self.editDepartmentID.text())
-        setting['accountType'] = str(self.editAccountType.text())
+        setting['accountType'] = self.accountTypeReverse[unicode(self.editAccountType.currentText())]
         f = shelve.open('setting.vn')
         f['login'] = setting
         f.close()	
@@ -1187,7 +1197,7 @@ class LoginWidget(QtGui.QDialog):
         # 当窗口被关闭时，先保存登录数据，再关闭
         self.saveData()
         event.accept()  	
-
+ 
 
 ########################################################################
 class ControlWidget(QtGui.QWidget):
@@ -1241,6 +1251,8 @@ class TradingWidget(QtGui.QWidget):
     dictPriceType['0'] = u'限价委托'
     dictPriceType['4'] = u'最优五档剩余撤销'
     dictPriceType['6'] = u'最优五档剩余转限价'
+    
+
     
     contractItem = OrderedDict()
     
@@ -1479,6 +1491,7 @@ class TradingWidget(QtGui.QWidget):
         # 发单按钮
         buttonSendOrder = QtGui.QPushButton(u'发单')
         buttonCancelAll = QtGui.QPushButton(u'全撤')
+        auto = QtGui.QPushButton(u'自动套利')
 
         # 整合布局
         hbox = QtGui.QHBoxLayout()
@@ -1489,13 +1502,14 @@ class TradingWidget(QtGui.QWidget):
         vbox.addLayout(hbox)
         vbox.addWidget(buttonSendOrder)
         vbox.addWidget(buttonCancelAll)
+        vbox.addWidget(auto)
 
         self.setLayout(vbox)
 
         # 关联更新
         buttonSendOrder.clicked.connect(self.sendOrder)
         buttonCancelAll.clicked.connect(self.__orderMonitor.cancelAll)
-#         self.lineID.returnPressed.connect(self.updateID)
+        self.lineID.returnPressed.connect(self.updateID)
 #         self.contract.connect(self.updateID) 
 
     #----------------------------------------------------------------------
