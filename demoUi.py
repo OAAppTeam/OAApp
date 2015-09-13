@@ -652,7 +652,6 @@ class OrderMonitor(QtGui.QTableWidget):
         #ReOrder = self.__mainEngine.wa.tQuery('Order', options)
         #print ReOrder
         
-        
         self.dictOrderData[orderref] = data
 
         # 如果之前已经收到过这个账户的数据, 则直接更新
