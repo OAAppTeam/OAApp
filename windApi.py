@@ -19,7 +19,11 @@ class WindApi:
 
     # 判断是否连接
     def isConnected(self):
-        return w.isconnected()
+        if not w.isconnected():
+            event = Event(type_=EVENT_LOG)
+            log = u'未连接服务器，请重启'
+            event.dict_['log'] = log
+            self.ee.put(event)
 
     # 取消订阅
     def cancelSubscribe(self, id):
