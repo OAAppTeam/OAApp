@@ -106,6 +106,7 @@ class WindApi:
         LogonID = w.tlogon(brokerId, departmentId, accountId, password, accountType)
         print LogonID
         if LogonID.ErrorCode != 0:
+            self.isConnected()
             event = Event(type_=EVENT_LOG)
             log = u'登陆错误，'
             event.dict_['log'] = log
