@@ -7,16 +7,14 @@ import datetime
 import numpy as np
 import matplotlib as plt
 import math
-
-def is_nan(x):
-    return math.isnan(float(x))
-
+import time
 
 class MACDApi:
-    # 传入一个起始时间参数,一个合约条款，一个选填合约，excel表格的路径
-    def __init__(self,start_date,var1,var2=None):
+    # (登陆的ID，起始时间，第一个合约条款，第二个选填合约)
+    def __init__(self,LogonID,start_date,var1,var2=None):
         # w.start()
         self.__start_date = datetime.datetime.strptime(start_date,"%Y-%m-%d %H:%M:%S")
+        self.__LogonID = LogonID
         self.__var1 = var1
         self.__var2 = var2
         self.__date_now = date.today()
@@ -25,36 +23,49 @@ class MACDApi:
         self.__standard_term = 9
 
      # 获得想要的收盘价(将一些脏数据过滤掉，例如'nan')
+    def get_temp_close_value(self,path):
+        data = xlrd.open_workbook(path).sheets()[0]
+        time_col = data.col_values(0)[1:]                                   #获得时间列，返回一个数组
+        time_value = []                                                      #将excel格式的时间转为datetime格式
+        for i in range(len(time_col)):
+            temp_time = xlrd.xldate_as_tuple(time_col[i],0)
+            time_value.append(datetime.datetime(temp_time[0],temp_time[1],temp_time[2],temp_time[3],temp_time[4]))
+        close_col = data.col_values(4)[1:]
+        time_close_dict = {}                                             #声明一个时间和收盘价的对照表，用字典储存
+        for i in range(len(time_value)):
+            time_close_dict[time_value[i]] = close_col[i]
+        return time_close_dict
+
+    #筛选出开始时间之后的值
+    def filter_value_by_time(self,date):
+        return date >= self.__start_date
+
+    # 对excel表格的数据进行处理
     def get_close_value(self):
-        table_1 = xlrd.open_workbook(self.__var1+".xlsx").sheets()[0]
-        time_col_1 = table_1.col_values(0)[1:]
-        close_col_1 = table_1.col_values(4)[1:]
-        time_1 = []
-        for i in range(len(time_col_1)):
-            temp = xlrd.xldate_as_tuple(time_col_1[i],0)
-            time_1.append(datetime.datetime(temp[0],temp[1],temp[2],temp[3],temp[4]))
         if self.__var2 == None:
-            # 根据时间来筛选数据
-            for j in range(len(time_col_1)):
-                if self.__start_date > time_1[j]:
-                    j = j + 1
-                else:
-                    break
-            return close_col_1[j:]
+            time_value = filter(self.filter_value_by_time,self.get_temp_close_value(self.__var1 + '.xlsx').keys())
+            time_value.sort()
+            time_close_dict = self.get_temp_close_value(self.__var1 + '.xlsx')
+            result_list = []
+            for item in time_value:
+                result_list.append(time_close_dict[item])
+            return result_list
         else:
-            table_2 = xlrd.open_workbook(self.__var2+".xlsx").sheets()[0]
-            time_col_2 = table_2.col_values(0)[1:]
-            close_col_2 = table_2.col_values(4)[1:]
-            time_2 = []
-            for k in range(len(time_col_2)):
-                temp = xlrd.xldate_as_tuple(time_col_2[k],0)
-                time_2.append(datetime.datetime(temp[0],temp[1],temp[2],temp[3],temp[4]))
-            for m in range(len(time_col_2)):
-                if self.__start_date > time_2[m]:
-                    m = m + 1
-                else:
-                    break
-            return (np.array(close_col_1[m:]) - np.array(close_col_2[m:])).tolist()
+            time_close_dict1 = self.get_temp_close_value(self.__var1 + '.xlsx')
+            time_close_dict2 = self.get_temp_close_value(self.__var2 + '.xlsx')
+            time_value1 = time_close_dict1.keys()
+            time_value2 = time_close_dict2.keys()
+            time_value_in_common = list(set(time_value1).intersection(set(time_value2)))
+            time_value_in_common = filter(self.filter_value_by_time,time_value_in_common)
+            time_value_in_common.sort()
+            result_list = []
+            for item in time_value_in_common:
+                result_list.append(round(time_close_dict1[item] - time_close_dict2[item] , 2))
+            return result_list
+
+    # 得到当前时间（分钟）的价格
+    def get_price(self):
+        return result_list[-1:]
 
     # 获得到今天为止长期（26）天的 ema
     def cal_longterm_EMA(self):
@@ -110,29 +121,35 @@ class MACDApi:
 
     # 得出交易的大小
     def do_operate(self):
-        operate = 0
         m_DIF = self.cal_DIF()
         m_DEA = self.cal_DEA()
         m_MACD = self.cal_MACD()
         # 金叉信号，DIF向上突破DEA，买入信号
         # 死叉信号，DIF向下跌破DEA，卖出信号
-        for i in range(len(m_MACD)):
-            if m_DIF[i] > 0 and m_DEA[i] > 0 and m_DIF[i] > m_DEA[i] :
-                operate = operate + 10
-            if m_DIF[i] < 0 and m_DEA[i] < 0 and m_DIF[i] < m_DEA[i] :
-                operate = operate - 10
-        return operate
+        if m_DIF[-1:] > m_DEA[-1:] :
+            w.torder([self.__var1,self.__var2],'buy',self.get_price(),10,self.__LogonID)
+        if m_DIF[-1:] < m_DEA[-1:] :
+            w.torder([self.__var1,self.__var2],'sale',self.get_price(),10,self.__LogonID)
+
+    # 判断是否是交易日的交易时间
+    def is_trade_time(self):
+        dayOfWeek = datetime.today().weekday()
+        current_hour = datetime.datetime.now().hour
+        if dayOfWeek == 5 or dayOfWeek == 6:
+            return False
+        elif (current_hour < 11 and current_hour > 9) or (current_hour>13 and current_hour<15):
+            return True
+        else:
+            return False
+
     # 做出交易
     def make_trade(self):
-        num = self.do_operate()
-        if num > 0:
-            dic = 'buy'
-        else:
-            dic = 'sale'
+        while True:
+            if self.is_trade_time():
+                self.do_operate()
+                time.sleep(1)
 
-macd = MACDApi("2015-09-11 9:00:00","IF1509")
-print macd.get_close_value()
-print macd.do_operate()
+
 
 
 
