@@ -1149,7 +1149,8 @@ class LoginWidget(QtGui.QDialog):
         accountType = self.accountTypeReverse[unicode(self.editAccountType.currentText())]
         print userid,password,brokerid,accountType
         #self.__mainEngine.wa.tLogon('00000010', '0' , "M:1585078833901", '111111','SHSZ')
-        self.__mainEngine.wa.tLogon(brokerid, departmentid , userid, password,accountType)
+        logonId = self.__mainEngine.wa.tLogon(brokerid, departmentid , userid, password,accountType)
+        self.__mainEngine.initLogonId(logonId)
         
         self.close()
 
@@ -1256,43 +1257,42 @@ class TradingWidget(QtGui.QWidget):
 
     
     contractItem = OrderedDict()
-    
-    contractItem['0'] = u'IF1509.CFE'
-    contractItem['1'] = u'IF1510.CFE'
-    contractItem['2'] = u'IF1512.CFE'
-    contractItem['3'] = u'IF1603.CFE'
-    contractItem['4'] = u'IF1509.CFE'
-    contractItem['5'] = u'10000031.SH'
-    contractItem['6'] = u'10000032.SH'
-    contractItem['7'] = u'10000033.SH'
-    contractItem['8'] = u'10000034.SH'
-    contractItem['9'] = u'10000035.SH'
-    contractItem['10'] = u'10000047.SH'
-    contractItem['11'] = u'10000055.SH'
-    contractItem['12'] = u'10000063.SH'
-    contractItem['13'] = u'10000071.SH'
-    contractItem['14'] = u'10000079.SH'
-    contractItem['15'] = u'10000087.SH'
-    contractItem['16'] = u'10000095.SH'
-    contractItem['17'] = u'10000103.SH'
-    contractItem['18'] = u'10000125.SH'
-    contractItem['19'] = u'10000139.SH'
-    contractItem['20'] = u'10000140.SH'
-    contractItem['21'] = u'10000149.SH'
-    contractItem['22'] = u'10000157.SH'
-    contractItem['23'] = u'10000165.SH'
-    contractItem['24'] = u'10000173.SH'
-    contractItem['25'] = u'10000181.SH'
-    contractItem['26'] = u'10000197.SH'
-    contractItem['27'] = u'10000225.SH'
-    contractItem['28'] = u'10000339.SH'
-    contractItem['29'] = u'10000357.SH'
-    contractItem['30'] = u'10000358.SH'
-    contractItem['31'] = u'10000359.SH'
-    contractItem['32'] = u'10000360.SH'
-    contractItem['33'] = u'10000387.SH'
-    contractItem['34'] = u'10000388.SH'
-    contractItem['35'] = u'10000389.SH'
+    contractItem['0'] = u''
+    contractItem['1'] = u'IF1509.CFE'
+    contractItem['2'] = u'IF1510.CFE'
+    contractItem['3'] = u'IF1512.CFE'
+    contractItem['4'] = u'IF1603.CFE'
+    contractItem['6'] = u'10000031.SH'
+    contractItem['7'] = u'10000032.SH'
+    contractItem['8'] = u'10000033.SH'
+    contractItem['9'] = u'10000034.SH'
+    contractItem['10'] = u'10000035.SH'
+    contractItem['11'] = u'10000047.SH'
+    contractItem['12'] = u'10000055.SH'
+    contractItem['13'] = u'10000063.SH'
+    contractItem['14'] = u'10000071.SH'
+    contractItem['15'] = u'10000079.SH'
+    contractItem['16'] = u'10000087.SH'
+    contractItem['17'] = u'10000095.SH'
+    contractItem['18'] = u'10000103.SH'
+    contractItem['19'] = u'10000125.SH'
+    contractItem['20'] = u'10000139.SH'
+    contractItem['21'] = u'10000140.SH'
+    contractItem['22'] = u'10000149.SH'
+    contractItem['23'] = u'10000157.SH'
+    contractItem['24'] = u'10000165.SH'
+    contractItem['25'] = u'10000173.SH'
+    contractItem['26'] = u'10000181.SH'
+    contractItem['27'] = u'10000197.SH'
+    contractItem['28'] = u'10000225.SH'
+    contractItem['29'] = u'10000339.SH'
+    contractItem['30'] = u'10000357.SH'
+    contractItem['31'] = u'10000358.SH'
+    contractItem['32'] = u'10000359.SH'
+    contractItem['33'] = u'10000360.SH'
+    contractItem['34'] = u'10000387.SH'
+    contractItem['35'] = u'10000388.SH'
+    contractItem['36'] = u'10000389.SH'
     
     # 反转字典
     dictDirectionReverse = {value:key for key,value in dictDirection.items()}
@@ -1487,8 +1487,7 @@ class TradingWidget(QtGui.QWidget):
 
         # 发单按钮
         buttonSendOrder = QtGui.QPushButton(u'发单')
-        buttonCancelAll = QtGui.QPushButton(u'全撤')
-        auto = QtGui.QPushButton(u'自动套利')
+        buttonAuto = QtGui.QPushButton(u'自动套利')
 
         # 整合布局
         hbox = QtGui.QHBoxLayout()
@@ -1498,16 +1497,16 @@ class TradingWidget(QtGui.QWidget):
         vbox = QtGui.QVBoxLayout()
         vbox.addLayout(hbox)
         vbox.addWidget(buttonSendOrder)
-        vbox.addWidget(buttonCancelAll)
-        vbox.addWidget(auto)
+        vbox.addWidget(buttonAuto)
 
         self.setLayout(vbox)
 
         # 关联更新
         buttonSendOrder.clicked.connect(self.sendOrder)
-        buttonCancelAll.clicked.connect(self.__orderMonitor.cancelAll)
+#         buttonCancelAll.clicked.connect(self.__orderMonitor.cancelAll)
+        buttonAuto.clicked.connect(self.autoArbitrage)
         self.lineID.returnPressed.connect(self.updateID)
-
+        
     #----------------------------------------------------------------------
     def updateID(self):
         """合约变化"""
@@ -1546,6 +1545,12 @@ class TradingWidget(QtGui.QWidget):
 
             # 更新目前的合约
             self.instrumentid = instrumentid
+            
+    def autoArbitrage(self):
+        name = unicode(self.contract.currentText())
+        name1 = unicode(self.contract1.currentText())
+        self.__mainEngine.autoArbitrageEngine(name, name1)
+            
 
     #----------------------------------------------------------------------
     def updateMarketData(self, event):

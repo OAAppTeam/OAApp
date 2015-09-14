@@ -11,6 +11,7 @@ class MainEngine:
         self.wa = WindApi(self.ee)
         self.wa.start()
         self.ee.start()
+        self.logonId = -1
 
         # 循环查询持仓和账户相关
         self.countGet = 0               # 查询延时计数
@@ -21,24 +22,17 @@ class MainEngine:
         self.dictInstrument = {}        # 字典（保存合约查询数据）
         # self.ee.register(EVENT_INSTRUMENT, self.insertInstrument)
 
-    def getLogonId(self):
-        data = self.wa.tQuery('LogonID')
-        return str(data.Data[0][0])
-
     def getAccount(self):
         '''查询账户'''
-        LogonId = self.getLogonId()
-        self.wa.tQuery("Account","LogonId=" + LogonId)
+        self.wa.tQuery("Account","LogonId=" + str(self.logonId))
 
     def getCapital(self):
         '''查询资金'''
-        LogonId = self.getLogonId()
-        self.wa.tQuery("Capital","LogonId=" + LogonId)
+        self.wa.tQuery("Capital","LogonId=" + str(self.logonId))
 
     def getPosition(self):
         '''查询持仓'''
-        LogonId = self.getLogonId()
-        self.wa.tQuery("Position","LogonId=" + LogonId)
+        self.wa.tQuery("Position","LogonId=" + str(self.logonId))
 
     def getAccountPosition(self, event):
         """循环查询账户和持仓"""
@@ -59,7 +53,6 @@ class MainEngine:
     def initGet(self, event):
         """在交易服务器登录成功后，开始初始化查询"""
         # 如果本地保存的合约数据是今日的，则载入，否则发出查询请求
-
         # 开始循环查询
         self.ee.register(EVENT_TIMER, self.getAccountPosition)
 
@@ -67,6 +60,18 @@ class MainEngine:
         log = u'合约信息查询'
         event.dict_['log'] = log
         self.ee.put(event)
+        
+    def initLogonId(self, logonId):
+        self.logonId = logonId
+        
+    def autoArbitrageEngine(self, contract, contract1):
+        macd = None
+        if self.logonId >= 0:
+            if contract1 == u'':
+                macd = MACDApi(self.logonId, '2015-08-01 13:00:00', contract)
+            else:
+                macd = MACDApi(self.logonId, '2015-08-01 13:00:00', contract, contract1)
+            macd.make_trade()
         
     def exit(self):
         """退出"""

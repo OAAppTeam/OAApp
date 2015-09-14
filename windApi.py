@@ -3,6 +3,7 @@ __author__ = 'Justin'
 
 from WindPy import *
 from eventEngine import *
+from myMACD import MACDApi
 
 class WindApi:
 
@@ -104,7 +105,6 @@ class WindApi:
     #交易登录
     def tLogon(self, brokerId, departmentId, accountId, password, accountType):
         LogonID = w.tlogon(brokerId, departmentId, accountId, password, accountType)
-        print LogonID
         if LogonID.ErrorCode != 0:
             event = Event(type_=EVENT_LOG)
             log = u'登陆错误，'
@@ -120,6 +120,7 @@ class WindApi:
             event2 = Event(type_=EVENT_TLOGON)
             event2.dict_['data'] = LogonID
             self.__eventEngine.put(event2)
+        return LogonID.Data[0][0]
             
     # 交易登出
     def tLogout(self):
