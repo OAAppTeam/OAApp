@@ -848,17 +848,22 @@ class OrderMonitor(QtGui.QTableWidget):
         d = self.dictOrder[cell.orderref]
     
         for label, cell in d.items():
+            value =''
             if label == 'CancelTime':
                 try:
-                    value = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time())) 
+                    value = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
+                    cell.setText(value) 
                 except KeyError:
                     value = u'未知类型'
+                    cell.setText(value)
             elif label == 'StatusMsg':
                 try:
                     value = 'Cancelled'
+                    cell.setText(value)
                 except KeyError:
-                    value = u'未知类型'      
-            cell.setText(value)
+                    value = u'未知类型'
+                    cell.setText(value)      
+            
     #----------------------------------------------------------------------
     def cancelAll(self):
         """全撤"""
