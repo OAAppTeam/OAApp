@@ -1910,6 +1910,7 @@ class MainWindow(QtGui.QMainWindow):
 
         if reply == QtGui.QMessageBox.Yes:
             self.__mainEngine.exit()
+            self.__mainEngine.stopArbitrage()
             event.accept()
         else:
             event.ignore()       
