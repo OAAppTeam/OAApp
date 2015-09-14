@@ -25,6 +25,7 @@ class MACDApi:
         self.__long_term = 26
         self.__short_term = 12
         self.__standard_term = 9
+        self.__break = False
 
      # 获得想要的收盘价(将一些脏数据过滤掉，例如'nan')
     def get_temp_close_value(self,path):
@@ -157,13 +158,17 @@ class MACDApi:
         else:
             return False
 
+    def change_break(self,break_status):
+        self.__break = break_status
+        
     # 做出交易
     def make_trade(self):
         while True:
             #if self.is_trade_time():
-            print 'make trade'
             self.do_operate()
             time.sleep(60)
+            if self.__break:
+                break
 
 
 

@@ -23,6 +23,7 @@ class MainEngine:
         # 合约储存相关
         self.dictInstrument = {}        # 字典（保存合约查询数据）
         # self.ee.register(EVENT_INSTRUMENT, self.insertInstrument)
+        self.__macd = None
 
     def getAccount(self):
         '''查询账户'''
@@ -73,12 +74,20 @@ class MainEngine:
                 macd = MACDApi(self.wa,self.logonId, contract)
             else:
                 macd = MACDApi(self.wa,self.logonId, contract, contract1)
+            self.__macd = macd
             thread = threading.Thread(target=macd.make_trade)
             event = Event(type_=EVENT_LOG)
             log = u'自动套利配置成功'
             event.dict_['log'] = log
             self.ee.put(event)
             thread.start()
+            
+    def stopArbitrage(self):
+        self.__macd.change_break(True)
+        event = Event(type_=EVENT_LOG)
+        log = u'自动套利已取消'
+        event.dict_['log'] = log
+        self.ee.put(event)
         
     def exit(self):
         """退出"""

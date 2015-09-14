@@ -643,189 +643,190 @@ class OrderMonitor(QtGui.QTableWidget):
     def updateOrder(self, event):
         """"""
         data = event.dict_['data']
-        orderSysID = data[0][0]
-        options = 'LogonID='+str(self.__mainEngine.wa.tQuery('LogonID').Data[0][0])+';RequestID='+str(orderSysID)+';showfields=OrderNumber,OrderStatus,TradedVolume,OrderTime,SecurityName'
-        message = self.__mainEngine.wa.tQuery('Order', options)
-        print u'报单'
-        print message
-        orderref = message.Data[0][0]
+        for i in range(0,len(data[0])):
+            orderSysID = data[0][i]
+            options = 'LogonID='+str(self.__mainEngine.wa.tQuery('LogonID').Data[0][0])+';RequestID='+str(orderSysID)+';showfields=OrderNumber,OrderStatus,TradedVolume,OrderTime,SecurityName'
+            message = self.__mainEngine.wa.tQuery('Order', options)
+            print u'报单'
+            print message
+            orderref = message.Data[0][0]
         #options = 'LogonID='+str(self.__mainEngine.wa.tQuery('LogonID').Data[0][0])+';WindCode='+str(event.dict_['code'])
         #ReOrder = self.__mainEngine.wa.tQuery('Order', options)
         #print ReOrder
         
-        self.dictOrderData[orderref] = data
-
-        # 如果之前已经收到过这个账户的数据, 则直接更新
-        if orderref in self.dictOrder:
-            d = self.dictOrder[orderref]
-
-            for label, cell in d.items():
-                if label == 'OrderRef':
-                    try:
-                        value = str(message.Data[0][0])
-                    except KeyError:
-                        value = u'未知类型'
-                elif label == 'OrderSysID':
-                    try:
-                        value = str(orderSysID)
-                    except KeyError:
-                        value = u'未知类型'
-                        
-                elif label == 'InstrumentID':
-                    try:
-                        value = data[1][0]
-                    except KeyError:
-                        value = u'未知类型'  
-                elif label == 'ExchangeInstID':
-                    try:
-                        value = message.Data[4][0]
-                    except KeyError:
-                        value = u'未知类型'  
-                elif label == 'Direction':
-                    try:
-                        value = data[2][0]
-                        if value == 'BUY':
-                            value = u'买'
-                        elif value == 'SHORT':
-                            value = u'卖'
-                        elif value == 'COVER':
-                            value = u'买'
-                        elif value == 'SELL':
-                            value = u'卖'
-                        elif value == 'COVERTODAY':
-                            value = u'买'
-                        elif value == 'SELLTODAY':
-                            value = u'卖'
-                    except KeyError:
-                        value = u'未知类型'        
-                elif label == 'CombOffsetFlag':
-                    try:
-                        value = data[2][0]
-                        if value == 'BUY':
-                            value = u'开仓'
-                        elif value == 'SHORT':
-                            value = u'开仓'
-                        elif value == 'COVER':
-                            value = u'平仓'
-                        elif value == 'SELL':
-                            value = u'平仓'
-                        elif value == 'COVERTODAY':
-                            value = u'平今仓'
-                        elif value == 'SELLTODAY':
-                            value = u'平今仓'
-                    except KeyError:
-                        value = u'未知类型'
-                elif label == 'LimitPrice':
-                    value = data[3][0]
-                
-                elif label == 'VolumeTotalOriginal':
-                    value = data[4][0]
-                
-                elif label == 'VolumeTraded':
-                    value = str(message.Data[2][0])
-                 
-                elif label == 'InsertTime':
-                    value = str(message.Data[3][0])
-                 
-                elif label == 'CancelTime':
-                    value = ''
-                 
-                elif label == 'StatusMsg':
-                    value = str(message.Data[1][0])
-                if value == None:
-                    value =''
-                cell.setText(value)
-                
-           # 否则插入新的一行，并更新
-
-        else:
-            self.insertRow(0)
-            d = {}
-
-            for col, label in enumerate(self.dictLabels.keys()):
-                if label == 'OrderRef':
-                    try:
-                        
-                        value = str(message.Data[0][0])
-                    except KeyError:
-                        value = u'未知类型'
-                elif label == 'OrderSysID':
-                    try:
-                        value = str(orderSysID)
-                    except KeyError:
-                        value = u'未知类型'
-                        
-                elif label == 'InstrumentID':
-                    try:
-                        value = data[1][0]
-                    except KeyError:
-                        value = u'未知类型'  
-                elif label == 'ExchangeInstID':
-                    try:
-                        value = message.Data[4][0]
-                    except KeyError:
-                        value = u'未知类型'  
-                elif label == 'Direction':
-                    try:
-                        value = data[2][0]
-                        if value == 'BUY':
-                            value = u'买'
-                        elif value == 'SHORT':
-                            value = u'卖'
-                        elif value == 'COVER':
-                            value = u'买'
-                        elif value == 'SELL':
-                            value = u'卖'
-                        elif value == 'COVERTODAY':
-                            value = u'买'
-                        elif value == 'SELLTODAY':
-                            value = u'卖'
-                    except KeyError:
-                        value = u'未知类型'        
-                elif label == 'CombOffsetFlag':
-                    try:
-                        value = data[2][0]
-                        if value == 'BUY':
-                            value = u'开仓'
-                        elif value == 'SHORT':
-                            value = u'开仓'
-                        elif value == 'COVER':
-                            value = u'平仓'
-                        elif value == 'SELL':
-                            value = u'平仓'
-                        elif value == 'COVERTODAY':
-                            value = u'平今仓'
-                        elif value == 'SELLTODAY':
-                            value = u'平今仓'
-                    except KeyError:
-                        value = u'未知类型'
-                elif label == 'LimitPrice':
-                    value = data[3][0]
-                
-                elif label == 'VolumeTotalOriginal':
-                    value = data[4][0]
-                
-
-                elif label == 'VolumeTraded':
-                    value = str(message.Data[2][0])
-                 
-                elif label == 'InsertTime':
-                    value =str( message.Data[3][0])
-                 
-                elif label == 'CancelTime':
-                    value = ''
-                 
-                elif label == 'StatusMsg':
-                    value = str(message.Data[1][0])
-                if value == None:
-                    value =''
-                cell = QtGui.QTableWidgetItem(value)
-                self.setItem(0, col, cell)
-                d[label] = cell
-
-                cell.orderref =	message.Data[0][0]   # 动态绑定报单号到单元格上
-
-            self.dictOrder[orderref] = d
+            self.dictOrderData[orderref] = data
+    
+            # 如果之前已经收到过这个账户的数据, 则直接更新
+            if orderref in self.dictOrder:
+                d = self.dictOrder[orderref]
+    
+                for label, cell in d.items():
+                    if label == 'OrderRef':
+                        try:
+                            value = str(message.Data[0][0])
+                        except KeyError:
+                            value = u'未知类型'
+                    elif label == 'OrderSysID':
+                        try:
+                            value = str(orderSysID)
+                        except KeyError:
+                            value = u'未知类型'
+                            
+                    elif label == 'InstrumentID':
+                        try:
+                            value = data[1][i]
+                        except KeyError:
+                            value = u'未知类型'  
+                    elif label == 'ExchangeInstID':
+                        try:
+                            value = message.Data[4][0]
+                        except KeyError:
+                            value = u'未知类型'  
+                    elif label == 'Direction':
+                        try:
+                            value = data[2][i]
+                            if value == 'BUY':
+                                value = u'买'
+                            elif value == 'SHORT':
+                                value = u'卖'
+                            elif value == 'COVER':
+                                value = u'买'
+                            elif value == 'SELL':
+                                value = u'卖'
+                            elif value == 'COVERTODAY':
+                                value = u'买'
+                            elif value == 'SELLTODAY':
+                                value = u'卖'
+                        except KeyError:
+                            value = u'未知类型'        
+                    elif label == 'CombOffsetFlag':
+                        try:
+                            value = data[2][i]
+                            if value == 'BUY':
+                                value = u'开仓'
+                            elif value == 'SHORT':
+                                value = u'开仓'
+                            elif value == 'COVER':
+                                value = u'平仓'
+                            elif value == 'SELL':
+                                value = u'平仓'
+                            elif value == 'COVERTODAY':
+                                value = u'平今仓'
+                            elif value == 'SELLTODAY':
+                                value = u'平今仓'
+                        except KeyError:
+                            value = u'未知类型'
+                    elif label == 'LimitPrice':
+                        value = data[3][i]
+                    
+                    elif label == 'VolumeTotalOriginal':
+                        value = data[4][i]
+                    
+                    elif label == 'VolumeTraded':
+                        value = str(message.Data[2][0])
+                     
+                    elif label == 'InsertTime':
+                        value = str(message.Data[3][0])
+                     
+                    elif label == 'CancelTime':
+                        value = ''
+                     
+                    elif label == 'StatusMsg':
+                        value = str(message.Data[1][0])
+                    if value == None:
+                        value =''
+                    cell.setText(value)
+                    
+               # 否则插入新的一行，并更新
+    
+            else:
+                self.insertRow(0)
+                d = {}
+    
+                for col, label in enumerate(self.dictLabels.keys()):
+                    if label == 'OrderRef':
+                        try:
+                            
+                            value = str(message.Data[0][0])
+                        except KeyError:
+                            value = u'未知类型'
+                    elif label == 'OrderSysID':
+                        try:
+                            value = str(orderSysID)
+                        except KeyError:
+                            value = u'未知类型'
+                            
+                    elif label == 'InstrumentID':
+                        try:
+                            value = data[1][i]
+                        except KeyError:
+                            value = u'未知类型'  
+                    elif label == 'ExchangeInstID':
+                        try:
+                            value = message.Data[4][0]
+                        except KeyError:
+                            value = u'未知类型'  
+                    elif label == 'Direction':
+                        try:
+                            value = data[2][i]
+                            if value == 'BUY':
+                                value = u'买'
+                            elif value == 'SHORT':
+                                value = u'卖'
+                            elif value == 'COVER':
+                                value = u'买'
+                            elif value == 'SELL':
+                                value = u'卖'
+                            elif value == 'COVERTODAY':
+                                value = u'买'
+                            elif value == 'SELLTODAY':
+                                value = u'卖'
+                        except KeyError:
+                            value = u'未知类型'        
+                    elif label == 'CombOffsetFlag':
+                        try:
+                            value = data[2][i]
+                            if value == 'BUY':
+                                value = u'开仓'
+                            elif value == 'SHORT':
+                                value = u'开仓'
+                            elif value == 'COVER':
+                                value = u'平仓'
+                            elif value == 'SELL':
+                                value = u'平仓'
+                            elif value == 'COVERTODAY':
+                                value = u'平今仓'
+                            elif value == 'SELLTODAY':
+                                value = u'平今仓'
+                        except KeyError:
+                            value = u'未知类型'
+                    elif label == 'LimitPrice':
+                        value = data[3][i]
+                    
+                    elif label == 'VolumeTotalOriginal':
+                        value = data[4][i]
+                    
+    
+                    elif label == 'VolumeTraded':
+                        value = str(message.Data[2][0])
+                     
+                    elif label == 'InsertTime':
+                        value =str( message.Data[3][0])
+                     
+                    elif label == 'CancelTime':
+                        value = ''
+                     
+                    elif label == 'StatusMsg':
+                        value = str(message.Data[1][0])
+                    if value == None:
+                        value =''
+                    cell = QtGui.QTableWidgetItem(value)
+                    self.setItem(0, col, cell)
+                    d[label] = cell
+    
+                    cell.orderref =	message.Data[0][0]   # 动态绑定报单号到单元格上
+    
+                self.dictOrder[orderref] = d
     
     #----------------------------------------------------------------------
     def cancelOrder(self, cell):
@@ -1533,6 +1534,7 @@ class TradingWidget(QtGui.QWidget):
         buttonSendOrder.clicked.connect(self.sendOrder)
         buttonArbitrage.clicked.connect(self.arbitrage)
         buttonAuto.clicked.connect(self.autoArbitrage)
+        buttonStop.clicked.connect(self.stopArbitrage)
         self.comboDirection1.setCurrentIndex(1)
         QtGui.QWidget.connect(self.comboDirection, QtCore.SIGNAL('activated(int)'), self.onActivated)
         QtGui.QWidget.connect(self.comboDirection1, QtCore.SIGNAL('activated(int)'), self.onActivated1)
@@ -1655,7 +1657,10 @@ class TradingWidget(QtGui.QWidget):
         name = unicode(self.contract.currentText())
         name1 = unicode(self.contract1.currentText())
         self.__mainEngine.autoArbitrageEngine(name, name1)
-            
+        
+    def stopArbitrage(self):
+        self.__mainEngine.stopArbitrage()
+                
 
     #----------------------------------------------------------------------
     def updateMarketData(self, event):
