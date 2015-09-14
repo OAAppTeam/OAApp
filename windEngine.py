@@ -76,7 +76,7 @@ class MainEngine:
             event = Event(type_=EVENT_LOG)
             log = u'自动套利配置成功'
             event.dict_['log'] = log
-            self.__eventEngine.put(event)
+            self.ee.put(event)
             thread.start()
         
     def exit(self):
