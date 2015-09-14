@@ -43,7 +43,7 @@ class MACDApi:
     # 对excel表格的数据进行处理
     def get_close_value(self):
         if self.__var2 == None:
-            time_value = filter(self.filter_value_by_time,self.get_temp_close_value(self.__var1 + '.xlsx').keys())
+            time_value = filter(self.filter_value_by_time,self.get_temp_close_value(self.__var1.split('.')[0] + '.xlsx').keys())
             time_value.sort()
             time_close_dict = self.get_temp_close_value(self.__var1 + '.xlsx')
             result_list = []
@@ -51,8 +51,8 @@ class MACDApi:
                 result_list.append(time_close_dict[item])
             return result_list
         else:
-            time_close_dict1 = self.get_temp_close_value(self.__var1 + '.xlsx')
-            time_close_dict2 = self.get_temp_close_value(self.__var2 + '.xlsx')
+            time_close_dict1 = self.get_temp_close_value(self.__var1.split('.')[0] + '.xlsx')
+            time_close_dict2 = self.get_temp_close_value(self.__var2.split('.')[0] + '.xlsx')
             time_value1 = time_close_dict1.keys()
             time_value2 = time_close_dict2.keys()
             time_value_in_common = list(set(time_value1).intersection(set(time_value2)))
@@ -133,7 +133,7 @@ class MACDApi:
 
     # 判断是否是交易日的交易时间
     def is_trade_time(self):
-        dayOfWeek = datetime.today().weekday()
+        dayOfWeek = datetime.datetime.today().weekday()
         current_hour = datetime.datetime.now().hour
         if dayOfWeek == 5 or dayOfWeek == 6:
             return False
