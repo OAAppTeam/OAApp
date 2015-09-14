@@ -1610,6 +1610,14 @@ class TradingWidget(QtGui.QWidget):
             self.instrumentid = instrumentid
 
     def arbitrage(self):
+        name = unicode(self.contract.currentText())
+        name1 = unicode(self.contract1.currentText())
+        direction = self.dictDirectionReverse[unicode(self.comboDirection.currentText())]  #买卖
+        direction1 = self.dictDirectionReverse[unicode(self.comboDirection1.currentText())]
+        price1 = str(self.spinPrice.value())
+        price1 = str(self.spinPrice1.value())
+        volume = str(self.spinVolume.value())   #数量
+        volume = str(self.spinVolume1.value())  
         pass
             
     def autoArbitrage(self):
