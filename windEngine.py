@@ -3,6 +3,7 @@ __author__ = 'Justin'
 
 import shelve
 from windApi import *
+import threading
 
 class MainEngine:
 
@@ -68,10 +69,15 @@ class MainEngine:
         macd = None
         if self.logonId >= 0:
             if contract1 == u'':
-                macd = MACDApi(self.logonId, '2015-08-01 13:00:00', contract)
+                macd = MACDApi(self.logonId, contract)
             else:
-                macd = MACDApi(self.logonId, '2015-08-01 13:00:00', contract, contract1)
-            macd.make_trade()
+                macd = MACDApi(self.logonId, contract, contract1)
+            thread = threading.Thread(target=macd.make_trade)
+            event = Event(type_=EVENT_LOG)
+            log = u'自动套利配置成功'
+            event.dict_['log'] = log
+            self.__eventEngine.put(event)
+            thread.start()
         
     def exit(self):
         """退出"""
