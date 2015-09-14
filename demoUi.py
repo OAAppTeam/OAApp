@@ -1529,10 +1529,29 @@ class TradingWidget(QtGui.QWidget):
         buttonSendOrder.clicked.connect(self.sendOrder)
         buttonArbitrage.clicked.connect(self.arbitrage)
         buttonAuto.clicked.connect(self.autoArbitrage)
+        self.comboDirection1.setCurrentIndex(1)
+        QtGui.QWidget.connect(self.comboDirection, QtCore.SIGNAL('activated(int)'), self.onActivated)
+        QtGui.QWidget.connect(self.comboDirection1, QtCore.SIGNAL('activated(int)'), self.onActivated1)
 
         QtGui.QWidget.connect(self.contract, QtCore.SIGNAL('activated(int)'), self.updateID)
         QtGui.QWidget.connect(self.contract1, QtCore.SIGNAL('activated(int)'), self.updateID1)
     #----------------------------------------------------------------------
+    def onActivated(self):
+        direction = self.dictDirectionReverse[unicode(self.comboDirection.currentText())]
+        if direction == '0':
+            self.comboDirection1.setCurrentIndex(1)
+            
+        if direction == '1':
+            self.comboDirection1.setCurrentIndex(0)
+        
+    def onActivated1(self):
+        direction = self.dictDirectionReverse[unicode(self.comboDirection1.currentText())]
+        if direction == '0':
+            self.comboDirection.setCurrentIndex(1)
+            
+        if direction == '1':
+            self.comboDirection.setCurrentIndex(0)
+        
     def updateID(self):
         """合约变化"""
         instrumentid = str(self.contract.currentText())
