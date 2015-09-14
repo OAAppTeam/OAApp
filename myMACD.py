@@ -4,16 +4,16 @@
 import xlrd
 from WindPy import *
 import datetime
-import numpy as np
-import matplotlib as plt
-import math
 import time
 
 class MACDApi:
-    # (登陆的ID，起始时间，第一个合约条款，第二个选填合约)
-    def __init__(self,LogonID,start_date,var1,var2=None):
-        # w.start()
-        self.__start_date = datetime.datetime.strptime(start_date,"%Y-%m-%d %H:%M:%S")
+    # (登陆的ID，第一个合约条款，第二个选填合约)
+    def __init__(self,LogonID,var1,var2=None):
+        dayOfWeek = datetime.datetime.today().weekday()
+        if dayOfWeek == 5 or dayOfWeek ==6:
+            self.__start_date = datetime.datetime.today() - datetime.timedelta(days=3)
+        else:
+            self.__start_date = datetime.datetime.today() - datetime.timedelta(days=1)
         self.__LogonID = LogonID
         self.__var1 = var1
         self.__var2 = var2
@@ -43,16 +43,17 @@ class MACDApi:
     # 对excel表格的数据进行处理
     def get_close_value(self):
         if self.__var2 == None:
-            time_value = filter(self.filter_value_by_time,self.get_temp_close_value(self.__var1.split('.')[0] + '.xlsx').keys())
+            time_value = filter(self.filter_value_by_time,self.get_temp_close_value('data/'+self.__var1.split('.')[0] + '.xlsx').keys())
             time_value.sort()
-            time_close_dict = self.get_temp_close_value(self.__var1 + '.xlsx')
+            print time_value
+            time_close_dict = self.get_temp_close_value('data/'+self.__var1.split('.')[0] + '.xlsx')
             result_list = []
             for item in time_value:
                 result_list.append(time_close_dict[item])
             return result_list
         else:
-            time_close_dict1 = self.get_temp_close_value(self.__var1.split('.')[0] + '.xlsx')
-            time_close_dict2 = self.get_temp_close_value(self.__var2.split('.')[0] + '.xlsx')
+            time_close_dict1 = self.get_temp_close_value('data/'+self.__var1.split('.')[0] + '.xlsx')
+            time_close_dict2 = self.get_temp_close_value('data/'+self.__var2.split('.')[0] + '.xlsx')
             time_value1 = time_close_dict1.keys()
             time_value2 = time_close_dict2.keys()
             time_value_in_common = list(set(time_value1).intersection(set(time_value2)))
@@ -65,7 +66,7 @@ class MACDApi:
 
     # 得到当前时间（分钟）的价格
     def get_price(self):
-        return result_list[-1:]
+        return self.get_close_value()[-1:]
 
     # 获得到今天为止长期（26）天的 ema
     def cal_longterm_EMA(self):
@@ -127,9 +128,19 @@ class MACDApi:
         # 金叉信号，DIF向上突破DEA，买入信号
         # 死叉信号，DIF向下跌破DEA，卖出信号
         if m_DIF[-1:] > m_DEA[-1:] :
-            w.torder([self.__var1,self.__var2],'buy',self.get_price(),10,self.__LogonID)
+            if var2 == None:
+                price = w.wsq([self.__var1],'rt_last').Data[0]
+                w.torder([self.__var1],'buy',price,10,self.__LogonID)
+            else:
+                price = w.wsq([self.__var1,self.__var2],'rt_last').Data[0]
+                w.torder([self.__var1,self.__var2],'buy',price(),10,self.__LogonID)
         if m_DIF[-1:] < m_DEA[-1:] :
-            w.torder([self.__var1,self.__var2],'sale',self.get_price(),10,self.__LogonID)
+            if var2 == None:
+                price = w.wsq([self.__var1],'rt_last').Data[0]
+                w.torder([self.__var1],'sale',price,10,self.__LogonID)
+            else:
+                price = w.wsq([self.__var1,self.__var2],'rt_last').Data[0]
+                w.torder([self.__var1,self.__var2],'sale',price,10,self.__LogonID)
 
     # 判断是否是交易日的交易时间
     def is_trade_time(self):
@@ -147,8 +158,7 @@ class MACDApi:
         while True:
             if self.is_trade_time():
                 self.do_operate()
-                time.sleep(1)
-
+                time.sleep(60)
 
 
 
