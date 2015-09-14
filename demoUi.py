@@ -1172,11 +1172,8 @@ class LoginWidget(QtGui.QDialog):
 
             self.editUserID.setText(userid)
             self.editPassword.setText(password)
-#             self.editMdAddress.setText(mdAddress)
-#             self.editTdAddress.setText(tdAddress)
             self.editBrokerID.setText(brokerid)
             self.editDepartmentID.setText(departmentid)
-#             self.editAccountType.setText(accountType)
         except KeyError:
             pass
 
@@ -1188,8 +1185,6 @@ class LoginWidget(QtGui.QDialog):
         setting = {}
         setting['userid'] = str(self.editUserID.text())
         setting['password'] = str(self.editPassword.text())
-#         setting['mdAddress'] = str(self.editMdAddress.text())
-#         setting['tdAddress'] = str(self.editTdAddress.text())
         setting['brokerid'] = str(self.editBrokerID.text())
         setting['departmentid'] = str(self.editDepartmentID.text())
         setting['accountType'] = self.accountTypeReverse[unicode(self.editAccountType.currentText())]
@@ -1335,7 +1330,6 @@ class TradingWidget(QtGui.QWidget):
         labelOperation = QtGui.QLabel(u'操作')
 
         self.lineID = QtGui.QLineEdit()
-#         self.lineName = QtGui.QLineEdit()
 
         self.comboDirection = QtGui.QComboBox()
         self.comboDirection.addItems(self.dictDirection.values())
@@ -1361,7 +1355,6 @@ class TradingWidget(QtGui.QWidget):
         self.comboPriceType.addItems(self.dictPriceType.values())
         
         self.lineID1 = QtGui.QLineEdit()
-#         self.lineName1 = QtGui.QLineEdit()
 
         self.comboDirection1 = QtGui.QComboBox()
         self.comboDirection1.addItems(self.dictDirection.values())
@@ -1388,7 +1381,6 @@ class TradingWidget(QtGui.QWidget):
 
         gridleft = QtGui.QGridLayout()
         gridleft.addWidget(labelID, 0, 0)
-#         gridleft.addWidget(labelName, 1, 0)
         gridleft.addWidget(labelDirection, 2, 0)
         gridleft.addWidget(labelOffset, 3, 0)
         gridleft.addWidget(labelContract, 4, 0)
@@ -1406,7 +1398,6 @@ class TradingWidget(QtGui.QWidget):
         gridleft.addWidget(self.priceMargin, 7, 1)
         gridleft.addWidget(self.comboPriceType, 8, 1)	
         gridleft.addWidget(self.lineID1, 0, 2)
-#         gridleft.addWidget(self.lineName1, 1, 2)
         gridleft.addWidget(self.comboDirection1, 2, 2)
         gridleft.addWidget(self.comboOffset1, 3, 2)
         gridleft.addWidget(self.contract1, 4, 2)
@@ -1516,17 +1507,14 @@ class TradingWidget(QtGui.QWidget):
         buttonSendOrder.clicked.connect(self.sendOrder)
         buttonCancelAll.clicked.connect(self.__orderMonitor.cancelAll)
         self.lineID.returnPressed.connect(self.updateID)
-#         self.contract.connect(self.updateID) 
 
     #----------------------------------------------------------------------
     def updateID(self):
         """合约变化"""
-#         instrumentid = str(self.lineID.text())
         instrumentid = str(self.contract.currentText())
         # 获取合约
         instrument = self.__mainEngine.wa.subscribe(instrumentid, "rt_bid1,rt_bsize1,rt_ask1,rt_asize1,rt_latest,rt_vol,rt_time,rt_pre_close")
         if instrument.ErrorCode==0:
-            #self.lineName.setText(instrument['InstrumentName'].decode('GBK'))
 
             # 清空价格数量
             self.spinPrice.setValue(0)
@@ -1556,13 +1544,6 @@ class TradingWidget(QtGui.QWidget):
             self.labelLastPrice.setText('')
             self.labelReturn.setText('')
 
-            # 重新注册事件监听
-#             self.__eventEngine.unregister(EVENT_MARKETDATA_CONTRACT+self.instrumentid, self.signal.emit)
-#             self.__eventEngine.register(EVENT_MARKETDATA_CONTRACT+instrumentid, self.signal.emit)
-# 
-#             # 订阅合约
-#             self.__mainEngine.wa.subscribe(instrumentid, "rt_bid1,rt_bsize1,rt_ask1,rt_asize1,rt_latest,rt_vol,rt_time")
-
             # 更新目前的合约
             self.instrumentid = instrumentid
 
@@ -1584,27 +1565,6 @@ class TradingWidget(QtGui.QWidget):
                     self.labelBidVolume1.setText(str(data[k][0]))
                 elif field[k] == 'RT_ASIZE1':
                     self.labelAskVolume1.setText(str(data[k][0]))
-            
-#             if data[15][0]:
-#                 self.labelBidPrice2.setText(str(data[7][0]))
-#                 self.labelBidPrice3.setText(str(data[8][0]))
-#                 self.labelBidPrice4.setText(str(data[9][0]))
-#                 self.labelBidPrice5.setText(str(data[10][0]))
-# 
-#                 self.labelAskPrice2.setText(str(data[11][0]))
-#                 self.labelAskPrice3.setText(str(data[12][0]))
-#                 self.labelAskPrice4.setText(str(data[13][0]))
-#                 self.labelAskPrice5.setText(str(data[14][0]))
-#             
-#                 self.labelBidVolume2.setText(str(data[15][0]))
-#                 self.labelBidVolume3.setText(str(data[16][0]))
-#                 self.labelBidVolume4.setText(str(data[17][0]))
-#                 self.labelBidVolume5.setText(str(data[18][0]))
-#                 
-#                 self.labelAskVolume2.setText(str(data[19][0]))
-#                 self.labelAskVolume3.setText(str(data[20][0]))
-#                 self.labelAskVolume4.setText(str(data[21][0]))
-#                 self.labelAskVolume5.setText(str(data[22][0]))	
                 elif field[k] == 'RT_LATEST':
                     self.labelLastPrice.setText(str(data[k][0]))
                     latest=data[k][0]
@@ -1622,9 +1582,6 @@ class TradingWidget(QtGui.QWidget):
     def sendOrder(self):
         """发单"""
         instrumentid = str(self.lineID.text())
-
-        #instrument = self.__mainEngine.selectInstrument(instrumentid)
-        #if instrument:
         
         direction = self.dictDirectionReverse[unicode(self.comboDirection.currentText())]
         offset = self.dictOffsetReverse[unicode(self.comboOffset.currentText())]
@@ -1666,36 +1623,32 @@ class AboutWidget(QtGui.QDialog):
         self.setWindowTitle(u'关于')
 
         text = u"""
-            vn.py框架Demo  
+            50ETF 期权与股指期货组合投资交易系统
 
-            完成日期：2015/4/17 
+            完成日期：2015/9/10
 
-            作者：用Python的交易员
+            作者：南京大学Friday小组
 
-            License：MIT
+            Github：github.com/OAAppTeam/OAApp
 
-            主页：vnpy.org
+            参考：vnpy框架   鸣谢作者：用python的交易员
 
-            Github：github.com/vnpy/vnpy
-
-            QQ交流群：262656087
-
-
+            vnpy框架Github：github.com/vnpy/vnpy
 
 
             开发环境
 
-            操作系统：Windows 7 专业版 64位
+            操作系统：Windows 8.1 专业版 64位
 
-            Python发行版：Python 2.7.6 (Anaconda 1.9.2 Win-32)
+            Python发行版：Python 2.7.9 (Anaconda 1.9.2 Win-32)
 
             图形库：PyQt4 4.11.3 Py2.7-x32
 
-            交易接口：vn.lts/vn.ctp
+            交易接口：windApi
 
-            事件驱动引擎：vn.event
+            事件驱动引擎：eventEngine
 
-            开发环境：WingIDE 5.0.6
+            开发环境：pycharm 4.0.6
 
             EXE打包：Nuitka 0.5.12.1 Python2.7 32 bit MSI
             """
@@ -1730,7 +1683,7 @@ class MainWindow(QtGui.QMainWindow):
     def initUi(self):
         """"""
         # 设置名称
-        self.setWindowTitle(u'欢迎使用vn.py框架Demo')
+        self.setWindowTitle(u'50ETF 期权与股指期货组合投资交易系统')
 
         # 布局设置
         self.logM = LogMonitor(self.__eventEngine, self)
@@ -1806,7 +1759,7 @@ class MainWindow(QtGui.QMainWindow):
         """"""
         data = event.dict_['data']
 
-        self.setWindowTitle(u'欢迎使用vn.py框架Demo  ' + data['InvestorName'].decode('GBK'))
+        self.setWindowTitle(u'50ETF 期权与股指期货组合投资交易系统  ' + data['InvestorName'].decode('GBK'))
 
     #----------------------------------------------------------------------
     def updateLog(self, event):
