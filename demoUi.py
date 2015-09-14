@@ -1639,13 +1639,15 @@ class TradingWidget(QtGui.QWidget):
         offset1 = self.dictOffsetReverse[unicode(self.comboOffset1.currentText())]
         tradeside = self.getTradeSide(direction,offset)
         tradeside1 = self.getTradeSide(direction1,offset1)
-        price1 = str(self.spinPrice.value())
+        price = str(self.spinPrice.value())
         price1 = str(self.spinPrice1.value())
         volume = str(self.spinVolume.value())   #数量
-        volume = str(self.spinVolume1.value())  
+        volume1 = str(self.spinVolume1.value())
         pricetype = self.dictPriceTypeReverse[unicode(self.comboPriceType.currentText())]
         pricetype1 = self.dictPriceTypeReverse[unicode(self.comboPriceType1.currentText())]
-        pass
+        self.__mainEngine.wa.tOrder(instrumentid, tradeside, price, volume, OrderType=pricetype)
+        self.__mainEngine.wa.tOrder(instrumentid1, tradeside1, price1, volume1, OrderType=pricetype1)
+
             
     def autoArbitrage(self):
         name = unicode(self.contract.currentText())
