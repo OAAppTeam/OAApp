@@ -3,6 +3,7 @@
 
 import xlrd
 from WindPy import *
+import numpy as np
 import datetime
 import time
 
@@ -128,14 +129,14 @@ class MACDApi:
         # 金叉信号，DIF向上突破DEA，买入信号
         # 死叉信号，DIF向下跌破DEA，卖出信号
         if m_DIF[-1:] > m_DEA[-1:] :
-            if var2 == None:
+            if self.__var2 == None:
                 price = w.wsq([self.__var1],'rt_last').Data[0]
                 w.torder([self.__var1],'buy',price,10,self.__LogonID)
             else:
                 price = w.wsq([self.__var1,self.__var2],'rt_last').Data[0]
                 w.torder([self.__var1,self.__var2],'buy',price(),10,self.__LogonID)
         if m_DIF[-1:] < m_DEA[-1:] :
-            if var2 == None:
+            if self.__var2 == None:
                 price = w.wsq([self.__var1],'rt_last').Data[0]
                 w.torder([self.__var1],'sale',price,10,self.__LogonID)
             else:
