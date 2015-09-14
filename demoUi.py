@@ -1507,6 +1507,7 @@ class TradingWidget(QtGui.QWidget):
 
         # 发单按钮
         buttonSendOrder = QtGui.QPushButton(u'发单')
+        buttonArbitrage = QtGui.QPushButton(u'套利')
         buttonAuto = QtGui.QPushButton(u'自动套利')
 
         # 整合布局
@@ -1519,6 +1520,7 @@ class TradingWidget(QtGui.QWidget):
         vbox = QtGui.QVBoxLayout()
         vbox.addLayout(hbox)
         vbox.addWidget(buttonSendOrder)
+        vbox.addWidget(buttonArbitrage)
         vbox.addWidget(buttonAuto)
 
         self.setLayout(vbox)
