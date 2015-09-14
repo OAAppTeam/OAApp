@@ -1527,9 +1527,9 @@ class TradingWidget(QtGui.QWidget):
 
         # 关联更新
         buttonSendOrder.clicked.connect(self.sendOrder)
-#         buttonCancelAll.clicked.connect(self.__orderMonitor.cancelAll)
+        buttonArbitrage.clicked.connect(self.arbitrage)
         buttonAuto.clicked.connect(self.autoArbitrage)
-#         self.lineID.returnPressed.connect(self.updateID)
+
         QtGui.QWidget.connect(self.contract, QtCore.SIGNAL('activated(int)'), self.updateID)
         QtGui.QWidget.connect(self.contract1, QtCore.SIGNAL('activated(int)'), self.updateID1)
     #----------------------------------------------------------------------
@@ -1607,7 +1607,10 @@ class TradingWidget(QtGui.QWidget):
             self.labelReturn.setText('')
 
             # 更新目前的合约
-            self.instrumentid = instrumentid    
+            self.instrumentid = instrumentid
+
+    def arbitrage(self):
+        pass
             
     def autoArbitrage(self):
         name = unicode(self.contract.currentText())
