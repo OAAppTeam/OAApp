@@ -1318,7 +1318,7 @@ class TradingWidget(QtGui.QWidget):
         self.setWindowTitle(u'交易')
 
         # 左边部分
-        labelID = QtGui.QLabel(u'代码')
+#         labelID = QtGui.QLabel(u'代码')
 #         labelName =  QtGui.QLabel(u'名称')
         labelDirection = QtGui.QLabel(u'委托类型')
         labelOffset = QtGui.QLabel(u'开平')
@@ -1380,7 +1380,7 @@ class TradingWidget(QtGui.QWidget):
         self.comboPriceType1.addItems(self.dictPriceType.values())
 
         gridleft = QtGui.QGridLayout()
-        gridleft.addWidget(labelID, 0, 0)
+#         gridleft.addWidget(labelID, 0, 0)
         gridleft.addWidget(labelDirection, 2, 0)
         gridleft.addWidget(labelOffset, 3, 0)
         gridleft.addWidget(labelContract, 4, 0)
@@ -1407,7 +1407,7 @@ class TradingWidget(QtGui.QWidget):
 #         gridleft.addWidget(self.comboPriceType1, 8, 2)    
 
         gridmiddle1 = QtGui.QGridLayout()
-        gridmiddle1.addWidget(self.lineID, 0, 2)
+#         gridmiddle1.addWidget(self.lineID, 0, 2)
         gridmiddle1.addWidget(self.comboDirection, 2, 2)
         gridmiddle1.addWidget(self.comboOffset, 3, 2)
         gridmiddle1.addWidget(self.contract, 4, 2)
@@ -1417,7 +1417,7 @@ class TradingWidget(QtGui.QWidget):
         gridmiddle1.addWidget(self.comboPriceType, 8, 2)    
 
         gridmiddle2 = QtGui.QGridLayout()
-        gridmiddle2.addWidget(self.lineID1, 0, 2)
+#         gridmiddle2.addWidget(self.lineID1, 0, 2)
         gridmiddle2.addWidget(self.comboDirection1, 2, 2)
         gridmiddle2.addWidget(self.comboOffset1, 3, 2)
         gridmiddle2.addWidget(self.contract1, 4, 2)
@@ -1527,8 +1527,9 @@ class TradingWidget(QtGui.QWidget):
         buttonSendOrder.clicked.connect(self.sendOrder)
 #         buttonCancelAll.clicked.connect(self.__orderMonitor.cancelAll)
         buttonAuto.clicked.connect(self.autoArbitrage)
-        self.lineID.returnPressed.connect(self.updateID)
-        
+#         self.lineID.returnPressed.connect(self.updateID)
+        QtGui.QWidget.connect(self.contract, QtCore.SIGNAL('activated(int)'), self.updateID)
+        QtGui.QWidget.connect(self.contract1, QtCore.SIGNAL('activated(int)'), self.updateID)
     #----------------------------------------------------------------------
     def updateID(self):
         """合约变化"""
