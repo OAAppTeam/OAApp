@@ -1529,7 +1529,7 @@ class TradingWidget(QtGui.QWidget):
         buttonAuto.clicked.connect(self.autoArbitrage)
 #         self.lineID.returnPressed.connect(self.updateID)
         QtGui.QWidget.connect(self.contract, QtCore.SIGNAL('activated(int)'), self.updateID)
-        QtGui.QWidget.connect(self.contract1, QtCore.SIGNAL('activated(int)'), self.updateID)
+        QtGui.QWidget.connect(self.contract1, QtCore.SIGNAL('activated(int)'), self.updateID1)
     #----------------------------------------------------------------------
     def updateID(self):
         """合约变化"""
@@ -1568,6 +1568,44 @@ class TradingWidget(QtGui.QWidget):
 
             # 更新目前的合约
             self.instrumentid = instrumentid
+            
+    def updateID1(self):
+        """合约变化"""
+        instrumentid = str(self.contract1.currentText())
+        # 获取合约
+        instrument = self.__mainEngine.wa.subscribe(instrumentid, "rt_bid1,rt_bsize1,rt_ask1,rt_asize1,rt_latest,rt_vol,rt_time,rt_pre_close")
+        if instrument.ErrorCode==0:
+
+            # 清空价格数量
+            self.spinPrice.setValue(0)
+            self.spinVolume.setValue(0)
+
+            # 清空行情显示
+            self.labelBidPrice1.setText('')
+            self.labelBidPrice2.setText('')
+            self.labelBidPrice3.setText('')
+            self.labelBidPrice4.setText('')
+            self.labelBidPrice5.setText('')
+            self.labelBidVolume1.setText('')
+            self.labelBidVolume2.setText('')
+            self.labelBidVolume3.setText('')
+            self.labelBidVolume4.setText('')
+            self.labelBidVolume5.setText('')    
+            self.labelAskPrice1.setText('')
+            self.labelAskPrice2.setText('')
+            self.labelAskPrice3.setText('')
+            self.labelAskPrice4.setText('')
+            self.labelAskPrice5.setText('')
+            self.labelAskVolume1.setText('')
+            self.labelAskVolume2.setText('')
+            self.labelAskVolume3.setText('')
+            self.labelAskVolume4.setText('')
+            self.labelAskVolume5.setText('')
+            self.labelLastPrice.setText('')
+            self.labelReturn.setText('')
+
+            # 更新目前的合约
+            self.instrumentid = instrumentid    
             
     def autoArbitrage(self):
         name = unicode(self.contract.currentText())
