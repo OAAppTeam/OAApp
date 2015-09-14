@@ -10,6 +10,7 @@ class MainEngine:
     def __init__(self):
         self.ee = EventEngine()
         self.wa = WindApi(self.ee)
+        
         self.wa.start()
         self.ee.start()
         self.logonId = -1
@@ -69,9 +70,9 @@ class MainEngine:
         macd = None
         if self.logonId >= 0:
             if contract1 == u'':
-                macd = MACDApi(self.logonId, contract)
+                macd = MACDApi(self.wa,self.logonId, contract)
             else:
-                macd = MACDApi(self.logonId, contract, contract1)
+                macd = MACDApi(self.wa,self.logonId, contract, contract1)
             thread = threading.Thread(target=macd.make_trade)
             event = Event(type_=EVENT_LOG)
             log = u'自动套利配置成功'

@@ -732,6 +732,8 @@ class OrderMonitor(QtGui.QTableWidget):
                  
                 elif label == 'StatusMsg':
                     value = str(message.Data[1][0])
+                if value == None:
+                    value =''
                 cell.setText(value)
                 
            # 否则插入新的一行，并更新
@@ -1687,7 +1689,7 @@ class TradingWidget(QtGui.QWidget):
     #----------------------------------------------------------------------
     def sendOrder(self):
         """发单"""
-        instrumentid = str(self.lineID.text())
+        instrumentid = str(self.contract.currentText())
         
         direction = self.dictDirectionReverse[unicode(self.comboDirection.currentText())]
         offset = self.dictOffsetReverse[unicode(self.comboOffset.currentText())]

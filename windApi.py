@@ -142,8 +142,8 @@ class WindApi:
             self.__eventEngine.put(event)
             
             event1 = Event(type_=EVENT_ORDER)
-            options = 'LogonID='+str(w.tquery('LogonID').Data[0][0])+';WindCode='+str(securityCode)
-            ReOrder = w.tquery('Order', options)
+            #options = 'LogonID='+str(w.tquery('LogonID').Data[0][0])+';WindCode='+str(securityCode)
+            #ReOrder = w.tquery('Order', options)
             #print ReOrder
             event1.dict_['data'] = message.Data
             event1.dict_['code'] = securityCode

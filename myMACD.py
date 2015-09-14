@@ -1,24 +1,27 @@
  # -*- encoding:UTF-8 -*-
 #计算macd 函数
 
-import xlrd
 from WindPy import *
+import xlrd
 import numpy as np
 import datetime
 import time
 
+
 class MACDApi:
     # (登陆的ID，第一个合约条款，第二个选填合约)
-    def __init__(self,LogonID,var1,var2=None):
-        dayOfWeek = datetime.datetime.today().weekday()
-        if dayOfWeek == 5 or dayOfWeek ==6:
-            self.__start_date = datetime.datetime.today() - datetime.timedelta(days=3)
-        else:
-            self.__start_date = datetime.datetime.today() - datetime.timedelta(days=1)
+    def __init__(self,wapi,LogonID,var1,var2=None):
+        dayOfWeek = date.today().weekday()
+#         if dayOfWeek == 5 or dayOfWeek ==6:
+#             self.__start_date = datetime.datetime.today() - datetime.timedelta(days=3)
+#         else:
+#             self.__start_date = datetime.datetime.today() - datetime.timedelta(days=1)
+        self.__start_date = datetime.datetime(2015,9,9,9,0)
+        self.__wapi = wapi
         self.__LogonID = LogonID
         self.__var1 = var1
         self.__var2 = var2
-        self.__date_now = date.today()
+        self.__date_now = datetime.datetime.today()
         self.__long_term = 26
         self.__short_term = 12
         self.__standard_term = 9
@@ -131,17 +134,17 @@ class MACDApi:
         if m_DIF[-1:] > m_DEA[-1:] :
             if self.__var2 == None:
                 price = w.wsq([self.__var1],'rt_last').Data[0]
-                w.torder([self.__var1],'buy',price,10,self.__LogonID)
+                self.__wapi.tOrder([self.__var1],'buy',price,10,logonId=self.__LogonID)
             else:
                 price = w.wsq([self.__var1,self.__var2],'rt_last').Data[0]
-                w.torder([self.__var1,self.__var2],'buy',price(),10,self.__LogonID)
+                self.__wapi.tOrder([self.__var1,self.__var2],'buy',price,10,logonId=self.__LogonID)
         if m_DIF[-1:] < m_DEA[-1:] :
             if self.__var2 == None:
                 price = w.wsq([self.__var1],'rt_last').Data[0]
-                w.torder([self.__var1],'sale',price,10,self.__LogonID)
+                self.__wapi.tOrder([self.__var1],'sale',price,10,logonId=self.__LogonID)
             else:
                 price = w.wsq([self.__var1,self.__var2],'rt_last').Data[0]
-                w.torder([self.__var1,self.__var2],'sale',price,10,self.__LogonID)
+                self.__wapi.tOrder([self.__var1,self.__var2],'sale',price,10,logonId=self.__LogonID)
 
     # 判断是否是交易日的交易时间
     def is_trade_time(self):
@@ -157,9 +160,10 @@ class MACDApi:
     # 做出交易
     def make_trade(self):
         while True:
-            if self.is_trade_time():
-                self.do_operate()
-                time.sleep(60)
+            #if self.is_trade_time():
+            print 'make trade'
+            self.do_operate()
+            time.sleep(60)
 
 
 
