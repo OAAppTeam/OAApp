@@ -111,6 +111,7 @@ class WindApi:
             event.dict_['log'] = log
             self.__eventEngine.put(event)
             self.isConnected()
+            return -1
         else:
             event1 = Event(type_=EVENT_LOG)
             log = u'登陆成功'
@@ -120,7 +121,7 @@ class WindApi:
             event2 = Event(type_=EVENT_TLOGON)
             event2.dict_['data'] = LogonID
             self.__eventEngine.put(event2)
-        return LogonID.Data[0][0]
+            return LogonID.Data[0][0]
             
     # 交易登出
     def tLogout(self):

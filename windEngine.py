@@ -91,7 +91,8 @@ class MainEngine:
         """退出"""
         # 销毁API对象
         self.wa = None
-
+        if self.__macd is not None:
+            self.stopArbitrage()
         # 停止事件驱动引擎
         self.ee.stop()
 
