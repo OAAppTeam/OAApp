@@ -68,14 +68,12 @@ class MainEngine:
         self.logonId = logonId
         
     def autoArbitrageEngine(self, contract, contract1):
-        macd = None
-        if self.logonId >= 0:
+        if self.logonId >= 0 and self.__macd is not None:
             if contract1 == u'':
-                macd = MACDApi(self.wa,self.logonId, contract)
+                self.__macd = MACDApi(self.wa,self.logonId, contract)
             else:
-                macd = MACDApi(self.wa,self.logonId, contract, contract1)
-            self.__macd = macd
-            thread = threading.Thread(target=macd.make_trade)
+                self.__macd = MACDApi(self.wa,self.logonId, contract, contract1)
+            thread = threading.Thread(target=self.__macd.make_trade)
             event = Event(type_=EVENT_LOG)
             log = u'自动套利配置成功'
             event.dict_['log'] = log
