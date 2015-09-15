@@ -526,10 +526,12 @@ class PositionMonitor(QtGui.QTableWidget):
         fields = data.Fields
         datas = data.Data
         # 过滤返回值为空的情况
-        posid = datas[fields.index('SecurityName')][0] + '.' + datas[fields.index('TradeSide')][0]
+        posid = u''
+        if 'SecurityName' in fields:
+            posid = datas[fields.index('SecurityName')][0] + '.' + datas[fields.index('TradeSide')][0]
 
         # 如果之前已经收到过这个账户的数据, 则直接更新
-        if posid in self.dictPosition:
+        if posid in self.dictPosition and posid != u'':
             d = self.dictPosition[posid]
 
             for label, cell in d.items():

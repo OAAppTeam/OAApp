@@ -75,7 +75,7 @@ class MainEngine:
         self.logonId = logonId
         
     def autoArbitrageEngine(self, contract, contract1):
-        if self.logonId >= 0 and self.__macd is not None:
+        if self.logonId >= 0 and self.__macd is None:
             if contract1 == u'':
                 self.__macd = MACDApi(self.wa,self.logonId, contract)
             else:
