@@ -71,9 +71,6 @@ class MainEngine:
         event.dict_['log'] = log
         self.ee.put(event)
         
-    def initLogonId(self, logonId):
-        self.logonId = logonId
-        
     def autoArbitrageEngine(self, contract, contract1):
         if self.logonId >= 0 and self.__macd is None:
             if contract1 == u'':
