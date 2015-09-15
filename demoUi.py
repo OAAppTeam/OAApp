@@ -1152,7 +1152,7 @@ class LoginWidget(QtGui.QDialog):
         departmentid = str(self.editDepartmentID.text())
         accountType = self.accountTypeReverse[unicode(self.editAccountType.currentText())]
         print userid,password,brokerid,accountType
-        self.__mainEngine.wa.isConnected()
+        self.__mainEngine.checkIsConnected()
         thread = threading.Thread(target=self.__mainEngine.wa.tLogon, args=(brokerid, departmentid , userid, password,accountType))
         thread.start()
         self.close()

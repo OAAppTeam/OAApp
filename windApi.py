@@ -12,7 +12,17 @@ class WindApi:
 
     # 开启
     def start(self):
+        event = Event(type_=EVENT_LOG)
+        log = u'正在连接服务器，请稍候'
+        event.dict_['log'] = log
+        self.__eventEngine.put(event)
         w.start()
+        if self.isConnected():
+            log = u'服务器连接成功'
+        else:
+            log = u'未连接服务器，请重启'
+        event.dict_['log'] = log
+        self.__eventEngine.put(event)
 
     # 停止
     def stop(self):
@@ -20,14 +30,7 @@ class WindApi:
 
     # 判断是否连接
     def isConnected(self):
-        event = Event(type_=EVENT_LOG)
-        log= u''
-        if not w.isconnected():
-            log = u'未连接服务器，请重启'
-        else:
-            log = u'正在登录，请稍候'
-        event.dict_['log'] = log
-        self.__eventEngine.put(event)
+        return w.isconnected()
 
     # 取消订阅
     def cancelSubscribe(self, id):

@@ -11,8 +11,7 @@ class MainEngine:
     def __init__(self):
         self.ee = EventEngine()
         self.wa = WindApi(self.ee)
-        
-        self.wa.start()
+
         self.ee.start()
         self.logonId = -1
 
@@ -52,6 +51,13 @@ class MainEngine:
             else:
                 self.getAccount() #查询账户
                 self.lastGet = 'Account'
+
+    def checkIsConnected(self):
+        if self.wa.isConnected():
+            event = Event(type_=EVENT_LOG)
+            log = u'正在登录，请稍候'
+            event.dict_['log'] = log
+            self.ee.put(event)
 
     #----------------------------------------------------------------------
     def initGet(self, event):
