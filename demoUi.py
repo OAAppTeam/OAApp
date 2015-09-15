@@ -360,7 +360,7 @@ class TradeMonitor(QtGui.QTableWidget):
                         except KeyError:
                             value = u'未知类型'
                  
-                    cell.setText(str(value))   
+                    cell.setText(unicode(value))   
             else:
                 self.insertRow(0)
                 d={}
