@@ -14,7 +14,7 @@ class MainEngine:
 
         self.ee.start()
         self.logonId = -1
-
+        
         # 循环查询持仓和账户相关
         self.countGet = 0               # 查询延时计数
         self.lastGet = 'Account'        # 上次查询的性质

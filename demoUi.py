@@ -1070,13 +1070,7 @@ class LoginWidget(QtGui.QDialog):
     """登录"""
     accountType = OrderedDict()
     
-    accountType['SHSZ'] = u'沪深A股'
-    accountType['SZB'] = u'深市B股'
-    accountType['SHB'] = u'沪市B股'
     accountType['CFE'] = u'中金所期货'
-    accountType['SHF'] = u'上期所期货'
-    accountType['DCE'] = u'大商所期货'
-    accountType['CZE'] = u'郑商所期货'
     accountType['SHO'] = u'上交所期权'
     
     accountTypeReverse = {value:key for key,value in accountType.items()}
