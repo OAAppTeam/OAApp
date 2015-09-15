@@ -360,7 +360,7 @@ class TradeMonitor(QtGui.QTableWidget):
                         except KeyError:
                             value = u'未知类型'
                  
-                    cell.setText(value)   
+                    cell.setText(str(value))   
             else:
                 self.insertRow(0)
                 d={}
@@ -468,7 +468,7 @@ class TradeMonitor(QtGui.QTableWidget):
                     else:
                         value=''
         
-                    cell = QtGui.QTableWidgetItem(value)
+                    cell = QtGui.QTableWidgetItem(str(value))
                     self.setItem(0, col, cell)
                     d[label] = cell
                     self.dictTrade[onum] = d
