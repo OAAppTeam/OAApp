@@ -20,6 +20,7 @@ import sip
 from PyQt4 import QtCore, QtGui
 
 from eventEngine import *
+import threading
 from matplotlib.transforms import offset_copy
 
 
@@ -1151,10 +1152,9 @@ class LoginWidget(QtGui.QDialog):
         departmentid = str(self.editDepartmentID.text())
         accountType = self.accountTypeReverse[unicode(self.editAccountType.currentText())]
         print userid,password,brokerid,accountType
-        #self.__mainEngine.wa.tLogon('00000010', '0' , "M:1585078833901", '111111','SHSZ')
-        logonId = self.__mainEngine.wa.tLogon(brokerid, departmentid , userid, password,accountType)
-        self.__mainEngine.initLogonId(logonId)
-        
+        self.__mainEngine.checkIsConnected()
+        thread = threading.Thread(target=self.__mainEngine.wa.tLogon, args=(brokerid, departmentid , userid, password,accountType))
+        thread.start()
         self.close()
 
     #----------------------------------------------------------------------
@@ -1910,7 +1910,7 @@ class MainWindow(QtGui.QMainWindow):
 
         if reply == QtGui.QMessageBox.Yes:
             self.__mainEngine.exit()
-            self.__mainEngine.stopArbitrage()
+
             event.accept()
         else:
             event.ignore()       

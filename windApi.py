@@ -3,7 +3,7 @@ __author__ = 'Justin'
 
 from WindPy import *
 from eventEngine import *
-from myMACD import MACDApi
+import threading
 
 class WindApi:
 
@@ -12,7 +12,17 @@ class WindApi:
 
     # 开启
     def start(self):
+        event = Event(type_=EVENT_LOG)
+        log = u'正在连接服务器，请稍候'
+        event.dict_['log'] = log
+        self.__eventEngine.put(event)
         w.start()
+        if self.isConnected():
+            log = u'服务器连接成功，现在可以登录'
+        else:
+            log = u'未连接服务器，请重启'
+        event.dict_['log'] = log
+        self.__eventEngine.put(event)
 
     # 停止
     def stop(self):
@@ -20,11 +30,7 @@ class WindApi:
 
     # 判断是否连接
     def isConnected(self):
-        if not w.isconnected():
-            event = Event(type_=EVENT_LOG)
-            log = u'未连接服务器，请重启'
-            event.dict_['log'] = log
-            self.__eventEngine.put(event)
+        return w.isconnected()
 
     # 取消订阅
     def cancelSubscribe(self, id):
@@ -110,17 +116,14 @@ class WindApi:
             log = u'登陆错误，'
             event.dict_['log'] = log
             self.__eventEngine.put(event)
-            self.isConnected()
         else:
             event1 = Event(type_=EVENT_LOG)
             log = u'登陆成功'
             event1.dict_['log'] = log
             self.__eventEngine.put(event1)
-
             event2 = Event(type_=EVENT_TLOGON)
             event2.dict_['data'] = LogonID
             self.__eventEngine.put(event2)
-        return LogonID.Data[0][0]
             
     # 交易登出
     def tLogout(self):

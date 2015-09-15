@@ -19,6 +19,8 @@ def main():
     me = MainEngine()
     mw = MainWindow(me.ee, me)
     mw.showMaximized()
+    thread = threading.Thread(target=me.wa.start)
+    thread.start()
     sys.exit(app.exec_())
 
 

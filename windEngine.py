@@ -3,6 +3,7 @@ __author__ = 'Justin'
 
 import shelve
 from windApi import *
+from myMACD import MACDApi
 import threading
 
 class MainEngine:
@@ -10,8 +11,7 @@ class MainEngine:
     def __init__(self):
         self.ee = EventEngine()
         self.wa = WindApi(self.ee)
-        
-        self.wa.start()
+
         self.ee.start()
         self.logonId = -1
 
@@ -52,12 +52,19 @@ class MainEngine:
                 self.getAccount() #查询账户
                 self.lastGet = 'Account'
 
+    def checkIsConnected(self):
+        if self.wa.isConnected():
+            event = Event(type_=EVENT_LOG)
+            log = u'正在登录，请稍候'
+            event.dict_['log'] = log
+            self.ee.put(event)
+
     #----------------------------------------------------------------------
     def initGet(self, event):
         """在交易服务器登录成功后，开始初始化查询"""
-        # 如果本地保存的合约数据是今日的，则载入，否则发出查询请求
-        # 开始循环查询
         self.ee.register(EVENT_TIMER, self.getAccountPosition)
+
+        self.logonId = event.dict_['data'].Data[0][0]
 
         event = Event(type_=EVENT_LOG)
         log = u'合约信息查询'
@@ -91,7 +98,8 @@ class MainEngine:
         """退出"""
         # 销毁API对象
         self.wa = None
-
+        if self.__macd is not None:
+            self.stopArbitrage()
         # 停止事件驱动引擎
         self.ee.stop()
 
