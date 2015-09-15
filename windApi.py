@@ -18,7 +18,7 @@ class WindApi:
         self.__eventEngine.put(event)
         w.start()
         if self.isConnected():
-            log = u'服务器连接成功'
+            log = u'服务器连接成功，现在可以登录'
         else:
             log = u'未连接服务器，请重启'
         event.dict_['log'] = log
