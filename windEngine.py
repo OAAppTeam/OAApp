@@ -86,6 +86,7 @@ class MainEngine:
             
     def stopArbitrage(self):
         self.__macd.change_break(True)
+        self.__macd = None
         event = Event(type_=EVENT_LOG)
         log = u'自动套利已取消'
         event.dict_['log'] = log
