@@ -539,7 +539,7 @@ class PositionMonitor(QtGui.QTableWidget):
                     value = unicode(datas[fields.index(label)][0])
                     cell.setText(value)
         # 否则插入新的一行，并更新
-        else:
+        elif posid not in self.dictPosition and posid != u'':
             self.insertRow(0)
             d = {}
 
