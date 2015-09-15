@@ -468,7 +468,7 @@ class TradeMonitor(QtGui.QTableWidget):
                     else:
                         value=''
         
-                    cell = QtGui.QTableWidgetItem(str(value))
+                    cell = QtGui.QTableWidgetItem(unicode(value))
                     self.setItem(0, col, cell)
                     d[label] = cell
                     self.dictTrade[onum] = d
