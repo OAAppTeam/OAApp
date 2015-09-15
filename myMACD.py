@@ -16,7 +16,7 @@ class MACDApi:
 #             self.__start_date = datetime.datetime.today() - datetime.timedelta(days=3)
 #         else:
 #             self.__start_date = datetime.datetime.today() - datetime.timedelta(days=1)
-        self.__start_date = datetime.datetime(2015,9,9,9,0)
+        self.__start_date = datetime.datetime(2015,8,1,9,0)
         self.__wapi = wapi
         self.__LogonID = LogonID
         self.__var1 = var1
@@ -26,6 +26,13 @@ class MACDApi:
         self.__short_term = 12
         self.__standard_term = 9
         self.__break = False
+
+    #更改起始时间
+    def change_start_date(self):
+        if self.__start_date > datetime.datetime(2015,9,10,9,0):
+            self.__start_date = datetime.datetime(2015,8,1,9,0)
+        else:
+            self.__start_date = self.__start_date + datetime.timedelta(days = 1)
 
      # 获得想要的收盘价(将一些脏数据过滤掉，例如'nan')
     def get_temp_close_value(self, path):
@@ -176,6 +183,7 @@ class MACDApi:
         while True:
             #if self.is_trade_time():
             self.do_operate()
+            self.change_start_date()
             time.sleep(60)
             if self.__break:
                 break
